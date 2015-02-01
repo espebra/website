@@ -4,6 +4,10 @@ date = "2010-08-16T20:15:00+01:00"
 title = "munincollector-ng"
 Tags = ["munin"]
 menu = "blog"
+aliases = [
+    "/2010/08/munincollector-ng",
+    "/blog/2010/08/munincollector-ng/"
+]
 
 +++
 

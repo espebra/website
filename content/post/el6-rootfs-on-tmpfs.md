@@ -5,6 +5,9 @@ Tags = ["diskless", "el6", "ipxe", "linux", "netboot"]
 date = "2012-04-31T21:44:19+01:00"
 menu = "blog"
 title = "CentOS/RHEL/SL 6: root filesystem on tmpfs"
+aliases = [
+    "/2012/04/centosrhelsl-6-root-filesystem-on-tmpfs"
+]
 
 +++
 

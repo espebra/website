@@ -5,6 +5,9 @@ Tags = ["filebin"]
 date = "2012-07-27T22:10:29+01:00"
 menu = "blog"
 title = "Filebin available on http://filebin.net"
+aliases = [
+    "/2012/07/filebin-available-on-httpfilebin-net"
+]
 
 +++
 

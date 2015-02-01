@@ -5,6 +5,9 @@ Tags = ["memory", "overhead", "virtualization", "xen", "kvm"]
 date = "2012-09-24T16:58:32+01:00"
 menu = "blog"
 title = "KVM/Xen and libvirt: currentMemory, memory and ballooning. Where did my memory go?"
+aliases = [
+    "/2012/09/kvmxen-and-libvirt-currentmemory-memory-and-ballooning-where-did-my-memory-go/"
+]
 
 +++
 
