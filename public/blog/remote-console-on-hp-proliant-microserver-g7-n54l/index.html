@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
+<head>
+  <link href="http://gmpg.org/xfn/11" rel="profile">
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+
+  <title> Remote console on HP ProLiant MicroServer G7 N54L &middot; golb </title>
+
+  
+  <link rel="stylesheet" href="http://localhost:1313/css/poole.css">
+  <link rel="stylesheet" href="http://localhost:1313/css/syntax.css">
+  <link rel="stylesheet" href="http://localhost:1313/css/hyde.css">
+  <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=PT+Sans:400,400italic,700|Abril+Fatface">
+
+  
+  <link rel="apple-touch-icon-precomposed" sizes="144x144" href="/apple-touch-icon-144-precomposed.png">
+  <link rel="shortcut icon" href="/favicon.ico">
+
+  
+  <link href="" rel="alternate" type="application/rss+xml" title="golb" />
+</head>
+
+<body>
+
+<div class="sidebar">
+  <div class="container sidebar-sticky">
+    <div class="sidebar-about">
+      <h1>golb</h1>
+      <p class="lead">
+        Espen Braastad
+      </p>
+    </div>
+
+    <ul class="sidebar-nav">
+      <li><a href="/">Home</a> </li>
+      
+    </ul>
+  </div>
+</div>
+
+
+    <div class="content container">
+<div class="post">
+  <h1>Remote console on HP ProLiant MicroServer G7 N54L</h1>
+  <span class="post-date">Sat, Aug 30, 2014</span>
+      <p>I bought the <a href="http://www8.hp.com/us/en/products/proliant-servers/product-detail.html?oid=6280786">HP ProLiant MicroServer G7 N54L</a> a while ago. I threw in a <a href="http://www8.hp.com/us/en/products/oas/product-detail.html?oid=4275612">HP MicroServer Remote Access Card Kit</a> to get remote console and power management. While the power management, web UI and CLI (over ssh) works fine out of the box, the remote console (KVM) does not. What happens is that the KVM client shows the following &ldquo;Out of range&rdquo; message:</p>
+
+<p><img src="/img/outofrange.png" alt="Out of range" />
+</p>
+
+<p>To fix this, go into the BIOS. Navigate to Advanced, PCI Express Configuration and Embedded VGA Control like this:</p>
+
+<p><img src="/img/bios1.png" alt="BIOS 1" />
+
+<img src="/img/bios2.png" alt="BIOS 2" />
+</p>
+
+<p>Flip from &ldquo;Always enabled&rdquo; (default) to &ldquo;Auto Detect&rdquo;. Save and quit. Then, make sure that your monitor is connected to the VGA port on the RAC instead of the embedded VGA port.</p>
+
+</div>
+</div>
+
+  <script>document.write('<script src="http://'
+        + (location.host || 'localhost').split(':')[0]
+		+ ':1313/livereload.js?mindelay=10"></'
+        + 'script>')</script></body>
+</html>

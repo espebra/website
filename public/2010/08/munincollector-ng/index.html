@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
+<head>
+  <link href="http://gmpg.org/xfn/11" rel="profile">
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+
+  <title> munincollector-ng &middot; golb </title>
+
+  
+  <link rel="stylesheet" href="http://localhost:1313/css/poole.css">
+  <link rel="stylesheet" href="http://localhost:1313/css/syntax.css">
+  <link rel="stylesheet" href="http://localhost:1313/css/hyde.css">
+  <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=PT+Sans:400,400italic,700|Abril+Fatface">
+
+  
+  <link rel="apple-touch-icon-precomposed" sizes="144x144" href="/apple-touch-icon-144-precomposed.png">
+  <link rel="shortcut icon" href="/favicon.ico">
+
+  
+  <link href="" rel="alternate" type="application/rss+xml" title="golb" />
+</head>
+
+<body>
+
+<div class="sidebar">
+  <div class="container sidebar-sticky">
+    <div class="sidebar-about">
+      <h1>golb</h1>
+      <p class="lead">
+        Espen Braastad
+      </p>
+    </div>
+
+    <ul class="sidebar-nav">
+      <li><a href="/">Home</a> </li>
+      
+    </ul>
+  </div>
+</div>
+
+
+    <div class="content container">
+<div class="post">
+  <h1>munincollector-ng</h1>
+  <span class="post-date">Mon, Aug 16, 2010</span>
+      <p>Munincollector-ng is a perl script that collects graphs from multiple <a href="http://munin-monitoring.org">munin</a> installations to display them in one page. A scenario where this is helpful is when you have (too) many munin clients on (too) many munin masters, and you want to look through some of the graphs - i.e. the <em>Disk usage in percent</em> (aka <em>df</em>) plugin - without spending/wasting too much time browsing through the less important graphs.</p>
+
+<p>It consists of one perl script and one configuration file. It is being executed regularly by cron. At each run, it iterates through the configuration file; downloads the graphs to a local directory and generates an html file.</p>
+
+<p>Below is some example configuration that will gather the <em>week</em> and <em>month</em> graphs from the <em>df</em> plugin from four separate munin masters (three without authentication and one with authentication). The graphs will be downloaded to <em>/var/www/munincollector-ng/</em>:</p>
+
+<pre><code># General configuration
+graph.plugin df
+graph.type week month
+graph.log /var/log/munincollector-ng.log
+graph.dir /var/www/munincollector-ng
+
+# Configuration per munin master you want to collect graphs from.
+# The format is: &lt;id&gt;.&lt;option&gt; &lt;value&gt;
+
+# Three munin installations with no authentication
+uio.url http://munin.ping.uio.no
+foo.url http://foo.com/munin/
+bar.url http://bar.com/munin/
+
+# One munin master that requires authentication
+baz.url http://baz.com/munin/
+baz.realm Munin
+baz.username user1
+baz.password pass1
+baz.netloc baz.com:80
+</code></pre>
+
+<p>An example cron job that will execute the script once per day (make sure <em>user</em> have write permissions in <em>/var/www/munincollector-ng/</em>):</p>
+
+<pre><code>8 8 * * * user /usr/local/bin/munincollector-ng -c /etc/munincollector-ng/example.conf
+</code></pre>
+
+<p>The script is available from <a href="https://github.com/espebra/munincollector-ng">Github</a>.</p>
+
+<p>PS: Put the <em>logo.png</em> and <em>style.css</em> from your <em>/etc/munin/templates/</em> directory into <em>/var/www/munincollector-ng/</em> to make it look a bit nicer.</p>
+
+</div>
+</div>
+
+  <script>document.write('<script src="http://'
+        + (location.host || 'localhost').split(':')[0]
+		+ ':1313/livereload.js?mindelay=10"></'
+        + 'script>')</script></body>
+</html>
