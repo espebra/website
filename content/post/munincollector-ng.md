@@ -9,6 +9,8 @@ menu = "blog"
 
 Munincollector-ng is a perl script that collects graphs from multiple [munin](http://munin-monitoring.org) installations to display them in one page. A scenario where this is helpful is when you have (too) many munin clients on (too) many munin masters, and you want to look through some of the graphs - i.e. the <em>Disk usage in percent</em> (aka <em>df</em>) plugin - without spending/wasting too much time browsing through the less important graphs.
 
+![Munincollector](/img/munincollector.png)
+
 It consists of one perl script and one configuration file. It is being executed regularly by cron. At each run, it iterates through the configuration file; downloads the graphs to a local directory and generates an html file.
 
 Below is some example configuration that will gather the <em>week</em> and <em>month</em> graphs from the <em>df</em> plugin from four separate munin masters (three without authentication and one with authentication). The graphs will be downloaded to <em>/var/www/munincollector-ng/</em>:

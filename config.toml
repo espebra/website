@@ -1,8 +1,6 @@
 languageCode = "en-us"
 title = "Espen Braastad"
 theme = "custom"
-baseurl = "http://espebra.github.io/website"
-canonifyurls = true
 
 [Author]
 name = "Espen Braastad"
