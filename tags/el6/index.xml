@@ -1,0 +1,368 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>El6 on Espen Braastad</title>
+    <link>/tags/el6/</link>
+    <description>Recent content in El6 on Espen Braastad</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <author>Espen Braastad</author>
+    
+    <lastBuildDate>Sun, 23 Jun 2013 21:44:19 &#43;0100</lastBuildDate>
+    <atom:link href="/tags/el6/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>CentOS/RHEL/SL 6: root filesystem on tmpfs, UPDATE #2</title>
+      <link>/post/el6-rootfs-on-tmpfs-update2/</link>
+      <pubDate>Sun, 23 Jun 2013 21:44:19 &#43;0100</pubDate>
+      <author>Espen Braastad</author>
+      <guid>/post/el6-rootfs-on-tmpfs-update2/</guid>
+      <description>
+
+&lt;p&gt;In a &lt;a href=&#34;/post/el6-rootfs-on-tmpfs&#34;&gt;previous post&lt;/a&gt;, I’ve explained how to boot EL6 from memory without having / needing a physical disk.&lt;/p&gt;
+
+&lt;p&gt;A bright reader, Jeff, came up with an alternative method. This alternative method does not involve dd’ing the image into a loop device, but instead copying the contents of the disk image directly into tmpfs. The result is higher write/read performance and generally lower memory requirements. The latter because unused disk space does not consume memory, which is important to consider when choosing the method to use in production systems.&lt;/p&gt;
+
+&lt;h2 id=&#34;example:8b7afac85e4821a1da5a25923e910783&#34;&gt;Example&lt;/h2&gt;
+
+&lt;p&gt;I got a lot of questions by e-mail on the previous posts regarding the subject and how to actually getting it to work, so this time I’ve created a complete set of files to get you going with Jeff’s method:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;The original &lt;code&gt;dmsquash-live-root&lt;/code&gt;. You won’t need this, but I added it as a reference.&lt;/li&gt;
+&lt;li&gt;The updated &lt;code&gt;dmsquash-live-root&lt;/code&gt;. You might need to look at this to understand what is going on.&lt;/li&gt;
+&lt;li&gt;The patch which is the diff of the two previous files. This one is used in the kickstart file below as a base64 encoded string.&lt;/li&gt;
+&lt;li&gt;The complete example kickstart file. This is a rather default CentOS 6.4 x86_64. The root password is being set to ‘foobar’.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&#34;build-the-disk-image:8b7afac85e4821a1da5a25923e910783&#34;&gt;Build the disk image&lt;/h2&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo yum install livecd-tools
+$ sudo livecd-creator --config=centos64-pxe.ks --fslabel=centos64-pxe
+$ sudo livecd-iso-to-pxeboot centos64-pxe.iso
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;The last command will output &lt;code&gt;vmlinuz0&lt;/code&gt; and &lt;code&gt;initrd0.img&lt;/code&gt;. Put these on your webserver, &lt;a href=&#34;http://example.com/&#34;&gt;http://example.com/&lt;/a&gt;.&lt;/p&gt;
+
+&lt;h2 id=&#34;boot-a-host-on-the-disk-image:8b7afac85e4821a1da5a25923e910783&#34;&gt;Boot a host on the disk image&lt;/h2&gt;
+
+&lt;p&gt;Boot it using DHCP, iPXE and the following iPXE script:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;#!ipxe 
+initrd http://example.com/initrd0.img
+kernel http://example.com/vmlinuz0 initrd=/initrd0.img root=/centos64-pxe.iso rootfstype=auto rw liveimg toram size=4096
+boot
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Note the size boot parameter. The patch will set the tmpfs size (in MB) according to this parameter. If the parameter is not set, 2048 is used as a default. The size can be changed runtime using mount, for example:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo mount -o remount,size=10G,rw /dev/root
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;difference-in-memory-usage:8b7afac85e4821a1da5a25923e910783&#34;&gt;Difference in memory usage&lt;/h2&gt;
+
+&lt;p&gt;The files in the file system in our example will consume around 1 GB of disk space. When booting with a file system (tmpfs) size of 4 GB, the memory usage is quite different between the previous and this (Jeff’s) method:&lt;/p&gt;
+
+&lt;h3 id=&#34;previous-method:8b7afac85e4821a1da5a25923e910783&#34;&gt;Previous method&lt;/h3&gt;
+
+&lt;p&gt;The important thing to notice here is that the file system already have allocated 4 GB of memory. This is because the file system already is consuming the amount of memory equivalent to the given size of the file system, independently on the actual disk space being consumed by the files currently in the file system.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;[root@lab-e ~]# free -m
+             total       used       free     shared    buffers     cached
+Mem:          7956       4272       3683          0          6       4135
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;One can argue that this is a waste of memory. On the other (conservative) side, one can argue that it is safest to pre-allocate the memory to reserve / ensure enough available memory to the file system should the system need it later. It depend on the use case, I guess.&lt;/p&gt;
+
+&lt;h3 id=&#34;this-method:8b7afac85e4821a1da5a25923e910783&#34;&gt;This method&lt;/h3&gt;
+
+&lt;p&gt;The memory footprint of the file system is equivalent of the size of the current files in the file system, which means that free disk space does not consume memory. In some scenarios, this may be a far better approach in terms of resource cost. You may however very well overbook too much, so be careful to leave sufficient memory available for new files to be added. If the file system tries to use more memory than what’s currently available, your system will crash.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;             total       used       free     shared    buffers     cached
+Mem:          7956       1179       6777          0          0       1001
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;difference-in-performance:8b7afac85e4821a1da5a25923e910783&#34;&gt;Difference in performance&lt;/h2&gt;
+
+&lt;p&gt;The following measurements are far from being scientifically valid.&lt;/p&gt;
+
+&lt;h3 id=&#34;previous-method-1:8b7afac85e4821a1da5a25923e910783&#34;&gt;Previous method&lt;/h3&gt;
+
+&lt;pre&gt;&lt;code&gt;[root@lab-a ~]# time dd if=/dev/zero of=/foobar bs=1M count=2000 ; time sync
+2000+0 records in
+2000+0 records out
+2097152000 bytes (2.1 GB) copied, 2.45832 s, 853 MB/s
+
+real    0m2.480s
+user    0m0.003s
+sys 0m2.002s
+
+real    0m0.245s
+user    0m0.000s
+sys 0m0.037s
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;this-method-1:8b7afac85e4821a1da5a25923e910783&#34;&gt;This method&lt;/h3&gt;
+
+&lt;pre&gt;&lt;code&gt;[root@lab-e ~]# time dd if=/dev/zero of=/foobar bs=1M count=2000 ; time sync
+2000+0 records in
+2000+0 records out
+2097152000 bytes (2.1 GB) copied, 0.823305 s, 2.5 GB/s
+
+real    0m0.825s
+user    0m0.002s
+sys 0m0.821s
+
+real    0m0.001s
+user    0m0.000s
+sys 0m0.002s
+&lt;/code&gt;&lt;/pre&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>CentOS/RHEL/SL 6: root filesystem on tmpfs, UPDATE</title>
+      <link>/post/el6-rootfs-on-tmpfs-update/</link>
+      <pubDate>Thu, 21 Mar 2013 09:57:00 CET</pubDate>
+      <author>Espen Braastad</author>
+      <guid>/post/el6-rootfs-on-tmpfs-update/</guid>
+      <description>&lt;p&gt;In EL6.4, the file &lt;code&gt;/usr/share/dracut/modules.d/90dmsquash-live/dmsquash-live-root&lt;/code&gt; was updated so that the &lt;a href=&#34;/post/el6-rootfs-on-tmpfs&#34;&gt;previous patch&lt;/a&gt; no longer works as it should. I’ve updated the patch, and here it is:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;--- original    2013-03-20 16:25:23.698846581 +0100
++++ new 2013-03-21 08:58:11.175339694 +0100
+@@ -24,6 +24,8 @@
+ getarg readonly_overlay &amp;amp;&amp;amp; readonly_overlay=&amp;quot;--readonly&amp;quot; || readonly_overlay=&amp;quot;&amp;quot;
+ overlay=$(getarg overlay)
+
++getarg toram &amp;amp;&amp;amp; toram=&amp;quot;yes&amp;quot;
++
+ # FIXME: we need to be able to hide the plymouth splash for the check really
+ [ -e $livedev ] &amp;amp; fs=$(blkid -s TYPE -o value $livedev)
+ if [ &amp;quot;$fs&amp;quot; = &amp;quot;iso9660&amp;quot; -o &amp;quot;$fs&amp;quot; = &amp;quot;udf&amp;quot; ]; then
+@@ -132,7 +134,10 @@
+     BASE_LOOPDEV=$( losetup -f )
+     losetup -r $BASE_LOOPDEV $EXT3FS
+
+-    do_live_from_base_loop
++    # Create overlay only if toram is not set
++    if [ -z &amp;quot;$toram&amp;quot; ] ; then
++        do_live_from_base_loop
++    fi
+ fi
+
+ # we might have an embedded ext3 on squashfs to use as rootfs (compressed live)
+@@ -163,13 +168,66 @@
+
+     umount -l /squashfs
+
+-    do_live_from_base_loop
++    # Create overlay only if toram is not set
++    if [ -z &amp;quot;$toram&amp;quot; ] ; then
++        do_live_from_base_loop
++    fi
++fi
++
++# If the kernel parameter toram is set, create a tmpfs device and copy the 
++# filesystem to it. Continue the boot process with this tmpfs device as
++# a writable root device.
++if [ -n &amp;quot;$toram&amp;quot; ] ; then
++    blocks=$( blockdev --getsz $BASE_LOOPDEV )
++
++    echo &amp;quot;Create tmpfs ($blocks blocks) for the root filesystem...&amp;quot;
++    mkdir -p /image
++    mount -n -t tmpfs -o nr_blocks=$blocks tmpfs /image
++
++    echo &amp;quot;Copy filesystem image to tmpfs... (this may take a few minutes)&amp;quot;
++    dd if=$BASE_LOOPDEV of=/image/rootfs.img
++
++    ROOTFS_LOOPDEV=$( losetup -f )
++    echo &amp;quot;Create loop device for the root filesystem: $ROOTFS_LOOPDEV&amp;quot;
++    losetup $ROOTFS_LOOPDEV /image/rootfs.img
++
++    echo &amp;quot;It&#39;s time to clean up.. &amp;quot;
++
++    echo &amp;quot; &amp;gt; Umounting images&amp;quot;
++    umount -l /image
++    umount -l /dev/.initramfs/live
++
++    echo &amp;quot; &amp;gt; Detach $OSMIN_LOOPDEV&amp;quot;
++    losetup -d $OSMIN_LOOPDEV
++
++    echo &amp;quot; &amp;gt; Detach $OSMIN_SQUASHED_LOOPDEV&amp;quot;
++    losetup -d $OSMIN_SQUASHED_LOOPDEV
++    
++    echo &amp;quot; &amp;gt; Detach $BASE_LOOPDEV&amp;quot;
++    losetup -d $BASE_LOOPDEV
++    
++    echo &amp;quot; &amp;gt; Detach $SQUASHED_LOOPDEV&amp;quot;
++    losetup -d $SQUASHED_LOOPDEV
++    
++    echo &amp;quot; &amp;gt; Detach /dev/loop0&amp;quot;
++    losetup -d /dev/loop0
++
++    losetup -a
++
++    echo &amp;quot;Root filesystem is now on $ROOTFS_LOOPDEV.&amp;quot;
++    echo
++
++    ln -s $ROOTFS_LOOPDEV /dev/root
++    printf &#39;/bin/mount -o rw %s %s\n&#39; &amp;quot;$ROOTFS_LOOPDEV&amp;quot; &amp;quot;$NEWROOT&amp;quot; &amp;gt; /mount/01-$$-live.sh
++    exit 0
+ fi
+
+ if [ -b &amp;quot;$OSMIN_LOOPDEV&amp;quot; ]; then
+     # set up the devicemapper snapshot device, which will merge
+     # the normal live fs image, and the delta, into a minimzied fs image
+-    echo &amp;quot;0 $( blockdev --getsz $BASE_LOOPDEV ) snapshot $BASE_LOOPDEV $OSMIN_LOOPDEV p 8&amp;quot; | dmsetup create --readonly live-osimg-min
++    if [ -z &amp;quot;$toram&amp;quot; ] ; then
++        echo &amp;quot;0 $( blockdev --getsz $BASE_LOOPDEV ) snapshot $BASE_LOOPDEV $OSMIN_LOOPDEV p 8&amp;quot; | dmsetup create --readonly live-osimg-min
++    fi
+ fi
+
+ ROOTFLAGS=&amp;quot;$(getarg rootflags)&amp;quot;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;It may be easier to download it from &lt;a href=&#34;/resources/patch.sl64.txt&#34;&gt;here&lt;/a&gt;.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>CentOS/RHEL/SL 6: root filesystem on tmpfs</title>
+      <link>/post/el6-rootfs-on-tmpfs/</link>
+      <pubDate>Tue, 01 May 2012 21:44:19 &#43;0100</pubDate>
+      <author>Espen Braastad</author>
+      <guid>/post/el6-rootfs-on-tmpfs/</guid>
+      <description>&lt;p&gt;UPDATE: The patch below has been updated &lt;a href=&#34;/post/el6-rootfs-on-tmpfs-update&#34;&gt;here&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;There are several scenarios where conventional hard drives are not really needed. Examples are HPC cluster nodes, virtualization nodes, home theater streaming PCs, silent desktops, internet cafés and embedded systems. Hard drives tend to fail, they are slow, they consume power, they generate heat and noise, and they are quite expensive if you need/want something faster and more reliable than SATA.&lt;/p&gt;
+
+&lt;p&gt;This post will show how to run CentOS 6 directly from tmpfs backed by memory, without using the (standard) 512 MB writable overlay. The procedure should be similar for RHEL and Scientific Linux 6.&lt;/p&gt;
+
+&lt;p&gt;The resulting boot process will be:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Boot a node off a PXE enabled DHCP server.&lt;/li&gt;
+&lt;li&gt;Chainload into &lt;a href=&#34;http://blog.braastad.org/?p=128&#34;&gt;iPXE&lt;/a&gt;.&lt;/li&gt;
+&lt;li&gt;Download vmlinuz and a rather large initrd containing the entire filesystem over ftp/http(s). Try to avoid &lt;a href=&#34;http://en.wikipedia.org/wiki/Trivial_File_Transfer_Protocol&#34;&gt;TFTP&lt;/a&gt; when downloading the initrd because of its file size limitation and slow transfer speeds.&lt;/li&gt;
+&lt;li&gt;Once downloaded, the kernel will start and the initrd will be mounted.&lt;/li&gt;
+&lt;li&gt;The modified dracut scripts in the initrd will create a tmpfs partition in memory with the same size as your filesystem image included in the initrd.&lt;/li&gt;
+&lt;li&gt;Your entire filesystem image will be copied to the tmpfs partition and attached to a loop device.&lt;/li&gt;
+&lt;li&gt;This loop device will be used as the new root device, and the boot process continues as usual.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;This is a screenshot from an ongoing boot process:
+&lt;img src=&#34;/img/centos6-from-tmpfs1.png&#34; alt=&#34;Boot process&#34; /&gt;
+&lt;/p&gt;
+
+&lt;p&gt;Now to the procedure:&lt;/p&gt;
+
+&lt;p&gt;First, create a custom kickstart file. I&amp;rsquo;ve included the specialties below:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;bootloader --location=mbr --append=&amp;quot;toram&amp;quot;
+clearpart --all
+firstboot --disabled
+install
+lang en_US.UTF-8
+network --bootproto dhcp --device eth0 --onboot yes
+part / --fstype=ext4 --size=2048
+reboot
+zerombr
+
+%packages
+patch
+
+%post
+cat &amp;gt; /etc/fstab &amp;lt;&amp;lt; END 
+tmpfs      /         tmpfs   defaults         0 0
+devpts     /dev/pts  devpts  gid=5,mode=620   0 0
+tmpfs      /dev/shm  tmpfs   defaults         0 0
+proc       /proc     proc    defaults         0 0
+sysfs      /sys      sysfs   defaults         0 0
+END
+
+# The patch is base64 encoded to avoid having to escape it manually.
+cat &amp;gt; /root/dmsquash-live-root.base64 &amp;lt;&amp;lt; EOF_patch
+MjFhMjIKPiBnZXRhcmcgdG9yYW0gJiYgdG9yYW09InllcyIKMTM0YzEzNSwxMzgKPCAgICAgZG9f
+bGl2ZV9mcm9tX2Jhc2VfbG9vcAotLS0KPiAgICAgIyBDcmVhdGUgb3ZlcmxheSBvbmx5IGlmIHRv
+cmFtIGlzIG5vdCBzZXQKPiAgICAgaWYgWyAteiAiJHRvcmFtIiBdIDsgdGhlbgo+ICAgICAgICAg
+ZG9fbGl2ZV9mcm9tX2Jhc2VfbG9vcAo+ICAgICBmaQoxNjNjMTY3LDIxMwo8ICAgICBkb19saXZl
+X2Zyb21fYmFzZV9sb29wCi0tLQo+ICAgICAjIENyZWF0ZSBvdmVybGF5IG9ubHkgaWYgdG9yYW0g
+aXMgbm90IHNldAo+ICAgICBpZiBbIC16ICIkdG9yYW0iIF0gOyB0aGVuCj4gICAgICAgICBkb19s
+aXZlX2Zyb21fYmFzZV9sb29wCj4gICAgIGZpCj4gZmkKPiAKPiAjIEkgdGhlIGtlcm5lbCBwYXJh
+bWV0ZXIgdG9yYW0gaXMgc2V0LCBjcmVhdGUgYSB0bXBmcyBkZXZpY2UgYW5kIGNvcHkgdGhlIAo+
+ICMgZmlsZXN5c3RlbSB0byBpdC4gQ29udGludWUgdGhlIGJvb3QgcHJvY2VzcyB3aXRoIHRoaXMg
+dG1wZnMgZGV2aWNlIGFzCj4gIyBhIHdyaXRhYmxlIHJvb3QgZGV2aWNlLgo+IGlmIFsgLW4gIiR0
+b3JhbSIgXSA7IHRoZW4KPiAgICAgYmxvY2tzPSQoIGJsb2NrZGV2IC0tZ2V0c3ogJEJBU0VfTE9P
+UERFViApCj4gCj4gICAgIGVjaG8gIkNyZWF0ZSB0bXBmcyAoJGJsb2NrcyBibG9ja3MpIGZvciB0
+aGUgcm9vdCBmaWxlc3lzdGVtLi4uIgo+ICAgICBta2RpciAtcCAvaW1hZ2UKPiAgICAgbW91bnQg
+LW4gLXQgdG1wZnMgLW8gbnJfYmxvY2tzPSRibG9ja3MgdG1wZnMgL2ltYWdlCj4gCj4gICAgIGVj
+aG8gIkNvcHkgZmlsZXN5c3RlbSBpbWFnZSB0byB0bXBmcy4uLiAodGhpcyBtYXkgdGFrZSBhIGZl
+dyBtaW51dGVzKSIKPiAgICAgZGQgaWY9JEJBU0VfTE9PUERFViBvZj0vaW1hZ2Uvcm9vdGZzLmlt
+Zwo+IAo+ICAgICBST09URlNfTE9PUERFVj0kKCBsb3NldHVwIC1mICkKPiAgICAgZWNobyAiQ3Jl
+YXRlIGxvb3AgZGV2aWNlIGZvciB0aGUgcm9vdCBmaWxlc3lzdGVtOiAkUk9PVEZTX0xPT1BERVYi
+Cj4gICAgIGxvc2V0dXAgJFJPT1RGU19MT09QREVWIC9pbWFnZS9yb290ZnMuaW1nCj4gCj4gICAg
+IGVjaG8gIkl0J3MgdGltZSB0byBjbGVhbiB1cC4uICIKPiAKPiAgICAgZWNobyAiID4gVW1vdW50
+aW5nIGltYWdlcyIKPiAgICAgdW1vdW50IC1sIC9pbWFnZQo+ICAgICB1bW91bnQgLWwgL2Rldi8u
+aW5pdHJhbWZzL2xpdmUKPiAKPiAgICAgZWNobyAiID4gRGV0YWNoICRPU01JTl9MT09QREVWIgo+
+ICAgICBsb3NldHVwIC1kICRPU01JTl9MT09QREVWCj4gCj4gICAgIGVjaG8gIiA+IERldGFjaCAk
+T1NNSU5fU1FVQVNIRURfTE9PUERFViIKPiAgICAgbG9zZXR1cCAtZCAkT1NNSU5fU1FVQVNIRURf
+TE9PUERFVgo+ICAgICAKPiAgICAgZWNobyAiID4gRGV0YWNoICRCQVNFX0xPT1BERVYiCj4gICAg
+IGxvc2V0dXAgLWQgJEJBU0VfTE9PUERFVgo+ICAgICAKPiAgICAgZWNobyAiID4gRGV0YWNoICRT
+UVVBU0hFRF9MT09QREVWIgo+ICAgICBsb3NldHVwIC1kICRTUVVBU0hFRF9MT09QREVWCj4gCj4g
+ICAgIGVjaG8gIlJvb3QgZmlsZXN5c3RlbSBpcyBub3cgb24gJFJPT1RGU19MT09QREVWLiIKPiAg
+ICAgZWNobwo+IAo+ICAgICBsbiAtcyAkUk9PVEZTX0xPT1BERVYgL2Rldi9yb290Cj4gICAgIHBy
+aW50ZiAnL2Jpbi9tb3VudCAtbyBydyAlcyAlc1xuJyAiJFJPT1RGU19MT09QREVWIiAiJE5FV1JP
+T1QiID4gL21vdW50LzAxLSQkLWxpdmUuc2gKPiAgICAgZXhpdCAwCjE2OWMyMTksMjIxCjwgICAg
+IGVjaG8gIjAgJCggYmxvY2tkZXYgLS1nZXRzeiAkQkFTRV9MT09QREVWICkgc25hcHNob3QgJEJB
+U0VfTE9PUERFViAkT1NNSU5fTE9PUERFViBwIDgiIHwgZG1zZXR1cCBjcmVhdGUgLS1yZWFkb25s
+eSBsaXZlLW9zaW1nLW1pbgotLS0KPiAgICAgaWYgWyAteiAiJHRvcmFtIiBdIDsgdGhlbgo+ICAg
+ICAgICAgZWNobyAiMCAkKCBibG9ja2RldiAtLWdldHN6ICRCQVNFX0xPT1BERVYgKSBzbmFwc2hv
+dCAkQkFTRV9MT09QREVWICRPU01JTl9MT09QREVWIHAgOCIgfCBkbXNldHVwIGNyZWF0ZSAtLXJl
+YWRvbmx5IGxpdmUtb3NpbWctbWluCj4gICAgIGZpCg==
+EOF_patch
+
+cat /root/dmsquash-live-root.base64 | base64 -d &amp;gt; /root/dmsquash-live-root.patch
+
+patch /usr/share/dracut/modules.d/90dmsquash-live/dmsquash-live-root /root/dmsquash-live-root.patch
+
+ls /lib/modules | while read kernel; do
+  echo &amp;quot; &amp;gt; Update initramfs for kernel ${kernel}&amp;quot;
+  initrdfile=&amp;quot;/boot/initramfs-${kernel}.img&amp;quot;
+
+  /sbin/dracut -f $initrdfile $kernel
+done
+%end
+
+%post --nochroot
+
+echo &amp;quot;Copy initramfs outside the chroot:&amp;quot;
+ls $INSTALL_ROOT/lib/modules | while read kernel; do
+  src=&amp;quot;$INSTALL_ROOT/boot/initramfs-${kernel}.img&amp;quot;
+  dst=&amp;quot;$LIVE_ROOT/isolinux/initrd0.img&amp;quot;
+  echo &amp;quot; &amp;gt; $src -&amp;gt; $dst&amp;quot;
+  cp -f $src $dst
+done
+%end
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;b&gt;Explaination:&lt;/b&gt; The post script will apply a patch to &lt;i&gt;/usr/share/dracut/modules.d/90dmsquash-live/dmsquash-live-root&lt;/i&gt; before regenerating the initramfs. This patch will add support for the &amp;lsquo;toram&amp;rsquo; boot parameter. Then, the initramfs is being copied to the isolinux directory outside the filesystem image.&lt;/p&gt;
+
+&lt;p&gt;Second, use &lt;i&gt;livecd-creator&lt;/i&gt; and &lt;i&gt;livecd-iso-to-pxeboot&lt;/i&gt; from the &lt;i&gt;livecd-tools&lt;/i&gt; package to convert the kickstart file into a bootable vmlinuz and initrd:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo livecd-creator --config=centos6.ks fslabel=centos6
+$ sudo livecd-iso-to-pxeboot centos6.iso
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;The commands above will create &lt;i&gt;tftpboot/vmlinuz0&lt;/i&gt; and &lt;i&gt;tftpboot/initrd0.img&lt;/i&gt;. Put these files on your boot server and create a suitable PXE configuration. &lt;i&gt;livecd-iso-to-pxeboot&lt;/i&gt; will create &lt;i&gt;tftpboot/pxelinux.cfg/default&lt;/i&gt; which can be used as a template.&lt;/p&gt;
+
+&lt;p&gt;Now you are ready to boot one or multiple CentOS 6 in-memory instances over the network!&lt;/p&gt;
+
+&lt;p&gt;Another screenshot:
+&lt;img src=&#34;/img/centos6-from-tmpfs-details.png&#34; alt=&#34;losetup&#34; /&gt;
+&lt;/p&gt;
+
+&lt;p&gt;Feature request &lt;a href=&#34;http://article.gmane.org/gmane.linux.kernel.initramfs/2588&#34;&gt;upstream&lt;/a&gt;.&lt;/p&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>

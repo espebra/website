@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
+<head>
+  <link href="http://gmpg.org/xfn/11" rel="profile">
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+
+  <title> CentOS/RHEL/SL 6: root filesystem on tmpfs, UPDATE &middot; Espen Braastad </title>
+
+  
+  <link rel="stylesheet" href="/css/poole.css">
+  <link rel="stylesheet" href="/css/syntax.css">
+  <link rel="stylesheet" href="/css/hyde.css">
+  <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=PT+Sans:400,400italic,700|Abril+Fatface">
+
+  
+  <link rel="stylesheet" href="/highlightjs/default.min.css">
+  <script src="/highlightjs/highlight.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script>
+
+  
+  <link rel="apple-touch-icon-precomposed" sizes="144x144" href="/apple-touch-icon-144-precomposed.png">
+  <link rel="shortcut icon" href="/favicon.ico">
+
+  
+  <link href="" rel="alternate" type="application/rss+xml" title="Espen Braastad" />
+
+  <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  
+    ga('create', 'UA-59220530-1', 'auto');
+    ga('send', 'pageview');
+  
+  </script>
+</head>
+
+  <body>
+
+    <div class="sidebar">
+  <div class="container sidebar-sticky">
+    <div class="sidebar-about">
+      <h1>Espen Braastad</h1>
+    </div>
+
+    <ul class="sidebar-nav">
+      <li><a href="/">Home</a> </li>
+      
+        <li><a href="/post">Posts</a></li>
+    </ul>
+  </div>
+</div>
+
+
+    <div class="content container">
+      <div class="post">
+        <h1>CentOS/RHEL/SL 6: root filesystem on tmpfs, UPDATE</h1>
+        <span class="post-date">Thu, Mar 21, 2013</span>
+        <p>In EL6.4, the file <code>/usr/share/dracut/modules.d/90dmsquash-live/dmsquash-live-root</code> was updated so that the <a href="/post/el6-rootfs-on-tmpfs">previous patch</a> no longer works as it should. I’ve updated the patch, and here it is:</p>
+
+<pre><code>--- original    2013-03-20 16:25:23.698846581 +0100
++++ new 2013-03-21 08:58:11.175339694 +0100
+@@ -24,6 +24,8 @@
+ getarg readonly_overlay &amp;&amp; readonly_overlay=&quot;--readonly&quot; || readonly_overlay=&quot;&quot;
+ overlay=$(getarg overlay)
+
++getarg toram &amp;&amp; toram=&quot;yes&quot;
++
+ # FIXME: we need to be able to hide the plymouth splash for the check really
+ [ -e $livedev ] &amp; fs=$(blkid -s TYPE -o value $livedev)
+ if [ &quot;$fs&quot; = &quot;iso9660&quot; -o &quot;$fs&quot; = &quot;udf&quot; ]; then
+@@ -132,7 +134,10 @@
+     BASE_LOOPDEV=$( losetup -f )
+     losetup -r $BASE_LOOPDEV $EXT3FS
+
+-    do_live_from_base_loop
++    # Create overlay only if toram is not set
++    if [ -z &quot;$toram&quot; ] ; then
++        do_live_from_base_loop
++    fi
+ fi
+
+ # we might have an embedded ext3 on squashfs to use as rootfs (compressed live)
+@@ -163,13 +168,66 @@
+
+     umount -l /squashfs
+
+-    do_live_from_base_loop
++    # Create overlay only if toram is not set
++    if [ -z &quot;$toram&quot; ] ; then
++        do_live_from_base_loop
++    fi
++fi
++
++# If the kernel parameter toram is set, create a tmpfs device and copy the 
++# filesystem to it. Continue the boot process with this tmpfs device as
++# a writable root device.
++if [ -n &quot;$toram&quot; ] ; then
++    blocks=$( blockdev --getsz $BASE_LOOPDEV )
++
++    echo &quot;Create tmpfs ($blocks blocks) for the root filesystem...&quot;
++    mkdir -p /image
++    mount -n -t tmpfs -o nr_blocks=$blocks tmpfs /image
++
++    echo &quot;Copy filesystem image to tmpfs... (this may take a few minutes)&quot;
++    dd if=$BASE_LOOPDEV of=/image/rootfs.img
++
++    ROOTFS_LOOPDEV=$( losetup -f )
++    echo &quot;Create loop device for the root filesystem: $ROOTFS_LOOPDEV&quot;
++    losetup $ROOTFS_LOOPDEV /image/rootfs.img
++
++    echo &quot;It's time to clean up.. &quot;
++
++    echo &quot; &gt; Umounting images&quot;
++    umount -l /image
++    umount -l /dev/.initramfs/live
++
++    echo &quot; &gt; Detach $OSMIN_LOOPDEV&quot;
++    losetup -d $OSMIN_LOOPDEV
++
++    echo &quot; &gt; Detach $OSMIN_SQUASHED_LOOPDEV&quot;
++    losetup -d $OSMIN_SQUASHED_LOOPDEV
++    
++    echo &quot; &gt; Detach $BASE_LOOPDEV&quot;
++    losetup -d $BASE_LOOPDEV
++    
++    echo &quot; &gt; Detach $SQUASHED_LOOPDEV&quot;
++    losetup -d $SQUASHED_LOOPDEV
++    
++    echo &quot; &gt; Detach /dev/loop0&quot;
++    losetup -d /dev/loop0
++
++    losetup -a
++
++    echo &quot;Root filesystem is now on $ROOTFS_LOOPDEV.&quot;
++    echo
++
++    ln -s $ROOTFS_LOOPDEV /dev/root
++    printf '/bin/mount -o rw %s %s\n' &quot;$ROOTFS_LOOPDEV&quot; &quot;$NEWROOT&quot; &gt; /mount/01-$$-live.sh
++    exit 0
+ fi
+
+ if [ -b &quot;$OSMIN_LOOPDEV&quot; ]; then
+     # set up the devicemapper snapshot device, which will merge
+     # the normal live fs image, and the delta, into a minimzied fs image
+-    echo &quot;0 $( blockdev --getsz $BASE_LOOPDEV ) snapshot $BASE_LOOPDEV $OSMIN_LOOPDEV p 8&quot; | dmsetup create --readonly live-osimg-min
++    if [ -z &quot;$toram&quot; ] ; then
++        echo &quot;0 $( blockdev --getsz $BASE_LOOPDEV ) snapshot $BASE_LOOPDEV $OSMIN_LOOPDEV p 8&quot; | dmsetup create --readonly live-osimg-min
++    fi
+ fi
+
+ ROOTFLAGS=&quot;$(getarg rootflags)&quot;
+</code></pre>
+
+<p>It may be easier to download it from <a href="/resources/patch.sl64.txt">here</a>.</p>
+
+        <div id="disqus_thread"></div>
+<script type="text/javascript">
+
+(function() {
+    
+    
+    if (window.location.hostname == "localhost") 
+        return;
+
+    var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+    var disqus_shortname = 'espebra';
+    var disqus_identifier = 'CentOS\/RHEL\/SL 6: root filesystem on tmpfs, UPDATE';
+
+    dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+})();
+</script>
+<noscript>Please enable JavaScript to view the comments powered by <a href="http://disqus.com/?ref_noscript">Disqus.</a></noscript>
+
+      </div>
+    </div>
+  </body>
+</html>

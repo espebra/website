@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
+<head>
+  <link href="http://gmpg.org/xfn/11" rel="profile">
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+
+  <title> KVM/Xen and libvirt: currentMemory, memory and ballooning. Where did my memory go? &middot; Espen Braastad </title>
+
+  
+  <link rel="stylesheet" href="/css/poole.css">
+  <link rel="stylesheet" href="/css/syntax.css">
+  <link rel="stylesheet" href="/css/hyde.css">
+  <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=PT+Sans:400,400italic,700|Abril+Fatface">
+
+  
+  <link rel="stylesheet" href="/highlightjs/default.min.css">
+  <script src="/highlightjs/highlight.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script>
+
+  
+  <link rel="apple-touch-icon-precomposed" sizes="144x144" href="/apple-touch-icon-144-precomposed.png">
+  <link rel="shortcut icon" href="/favicon.ico">
+
+  
+  <link href="" rel="alternate" type="application/rss+xml" title="Espen Braastad" />
+
+  <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  
+    ga('create', 'UA-59220530-1', 'auto');
+    ga('send', 'pageview');
+  
+  </script>
+</head>
+
+  <body>
+
+    <div class="sidebar">
+  <div class="container sidebar-sticky">
+    <div class="sidebar-about">
+      <h1>Espen Braastad</h1>
+    </div>
+
+    <ul class="sidebar-nav">
+      <li><a href="/">Home</a> </li>
+      
+        <li><a href="/post">Posts</a></li>
+    </ul>
+  </div>
+</div>
+
+
+    <div class="content container">
+      <div class="post">
+        <h1>KVM/Xen and libvirt: currentMemory, memory and ballooning. Where did my memory go?</h1>
+        <span class="post-date">Mon, Sep 24, 2012</span>
+        <p>KVM and Xen provide a method to change the amount of memory in use by guests at runtime. The method is called memory ballooning [<a href="http://www.linux-kvm.org/page/FAQ#Is_dynamic_memory_management_for_guests_supported.3F">1</a>, <a href="http://rwmj.wordpress.com/2010/07/17/virtio-balloon">2</a>], and it must be supported by the guest operating system to work.</p>
+
+<p>In libvirt, memory allocation (and hence the ballooning capability) for a guest can be configured using the <code>memory</code>, <code>currentMemory</code> and <code>memballoon</code> tags:</p>
+
+<pre><code>&lt;domain type='kvm'&gt;
+  [...]
+  &lt;memory unit='KiB'&gt;16777216&lt;/memory&gt;
+  &lt;currentMemory unit='KiB'&gt;1048576&lt;/currentMemory&gt;
+  [...]
+  &lt;devices&gt;
+    &lt;memballoon model='virtio'/&gt;
+  &lt;/devices&gt;
+&lt;/domain&gt;
+</code></pre>
+
+<p>The guest can never use more memory than specified in the <code>memory</code> tag and it is the amount of memory the guest will use at boot time. The <code>currentMemory</code> tag, if set, should be less than or equal (default) to <code>memory</code>. The guest will, when the balloon driver is loaded some time during the boot process, adjust itself to use the amount of memory specified by <code>currentMemory</code>. The <code>memballoon</code> tag is being added automatically, so there is really no need to specify it.</p>
+
+<p>The command line tool <code>virsh</code> can later be used on the host to see the current memory configuration for each guest:</p>
+
+<pre><code>[root@host ~]# virsh dominfo guest
+Id:             -
+Name:           guest
+UUID:           4f610a1f-7539-47cf-8299-9534500b340d
+OS Type:        hvm
+State:          shut off
+CPU(s):         1
+Max memory:     16777216 kB
+Used memory:    1048576 kB
+Persistent:     yes
+Autostart:      disable
+Managed save:   no
+</code></pre>
+
+<p>So far, so good. At this point it makes sense to set <code>memory</code> really high on all guests to ensure that we are able to reallocate memory on the fly for all our Linux guests. Doing this might not be a good idea.</p>
+
+<p>Linux as a guest, even though it has a balloon driver, does not seem to behave like one would expect. When <code>memory</code> is set higher than <code>currentMemory</code>, the guest operating system does not see (or use) the amount of memory that it should. Ideally, the value that libvirt reports as Used memory at the host should be visible inside the guest also.</p>
+
+<p>The graphs below show different guests (RHEL6, SL6 and Ubuntu Precise) on KVM (SL6) and Xen (RHEL5). The Y-axis show the amount of memory visible inside the guest (as reported by <code>free -m</code>), while the X-axis show the value of memory. The value of currentMemory is 1024M in all plots – which means that the guests should use 1024M of memory and that the graphs should stay flat out at 1024M, given zero overhead. The graphs show that this is not the reality.</p>
+
+<p><img src="/img/kvm-precise-1024.png" alt="KVM, Ubuntu Precise, 1024 MB ram" />
+</p>
+
+<p><img src="/img/kvm-rhel6-1024.png" alt="KVM, RHEL6, 1024 MB ram" />
+</p>
+
+<p><img src="/img/xen-sl6-1024.png" alt="Xen, SL6, 1024 MB ram" />
+</p>
+
+<p><img src="/img/xen-precise-1024.png" alt="Xen, Ubuntu Precise, 1024 MB ram" />
+</p>
+
+<p>The graphs with KVM do not have values for 32G memory because the guests went ballistic and OOM-ed.</p>
+
+        <div id="disqus_thread"></div>
+<script type="text/javascript">
+
+(function() {
+    
+    
+    if (window.location.hostname == "localhost") 
+        return;
+
+    var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+    var disqus_shortname = 'espebra';
+    var disqus_identifier = 'KVM\/Xen and libvirt: currentMemory, memory and ballooning. Where did my memory go?';
+
+    dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+})();
+</script>
+<noscript>Please enable JavaScript to view the comments powered by <a href="http://disqus.com/?ref_noscript">Disqus.</a></noscript>
+
+      </div>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
+<head>
+  <link href="http://gmpg.org/xfn/11" rel="profile">
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+
+  <title> CentOS/RHEL/SL 6: root filesystem on tmpfs, UPDATE #2 &middot; Espen Braastad </title>
+
+  
+  <link rel="stylesheet" href="/css/poole.css">
+  <link rel="stylesheet" href="/css/syntax.css">
+  <link rel="stylesheet" href="/css/hyde.css">
+  <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=PT+Sans:400,400italic,700|Abril+Fatface">
+
+  
+  <link rel="stylesheet" href="/highlightjs/default.min.css">
+  <script src="/highlightjs/highlight.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script>
+
+  
+  <link rel="apple-touch-icon-precomposed" sizes="144x144" href="/apple-touch-icon-144-precomposed.png">
+  <link rel="shortcut icon" href="/favicon.ico">
+
+  
+  <link href="" rel="alternate" type="application/rss+xml" title="Espen Braastad" />
+
+  <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  
+    ga('create', 'UA-59220530-1', 'auto');
+    ga('send', 'pageview');
+  
+  </script>
+</head>
+
+  <body>
+
+    <div class="sidebar">
+  <div class="container sidebar-sticky">
+    <div class="sidebar-about">
+      <h1>Espen Braastad</h1>
+    </div>
+
+    <ul class="sidebar-nav">
+      <li><a href="/">Home</a> </li>
+      
+        <li><a href="/post">Posts</a></li>
+    </ul>
+  </div>
+</div>
+
+
+    <div class="content container">
+      <div class="post">
+        <h1>CentOS/RHEL/SL 6: root filesystem on tmpfs, UPDATE #2</h1>
+        <span class="post-date">Sun, Jun 23, 2013</span>
+        
+
+<p>In a <a href="/post/el6-rootfs-on-tmpfs">previous post</a>, I’ve explained how to boot EL6 from memory without having / needing a physical disk.</p>
+
+<p>A bright reader, Jeff, came up with an alternative method. This alternative method does not involve dd’ing the image into a loop device, but instead copying the contents of the disk image directly into tmpfs. The result is higher write/read performance and generally lower memory requirements. The latter because unused disk space does not consume memory, which is important to consider when choosing the method to use in production systems.</p>
+
+<h2 id="example:8b7afac85e4821a1da5a25923e910783">Example</h2>
+
+<p>I got a lot of questions by e-mail on the previous posts regarding the subject and how to actually getting it to work, so this time I’ve created a complete set of files to get you going with Jeff’s method:</p>
+
+<ul>
+<li>The original <code>dmsquash-live-root</code>. You won’t need this, but I added it as a reference.</li>
+<li>The updated <code>dmsquash-live-root</code>. You might need to look at this to understand what is going on.</li>
+<li>The patch which is the diff of the two previous files. This one is used in the kickstart file below as a base64 encoded string.</li>
+<li>The complete example kickstart file. This is a rather default CentOS 6.4 x86_64. The root password is being set to ‘foobar’.</li>
+</ul>
+
+<h2 id="build-the-disk-image:8b7afac85e4821a1da5a25923e910783">Build the disk image</h2>
+
+<pre><code>$ sudo yum install livecd-tools
+$ sudo livecd-creator --config=centos64-pxe.ks --fslabel=centos64-pxe
+$ sudo livecd-iso-to-pxeboot centos64-pxe.iso
+</code></pre>
+
+<p>The last command will output <code>vmlinuz0</code> and <code>initrd0.img</code>. Put these on your webserver, <a href="http://example.com/">http://example.com/</a>.</p>
+
+<h2 id="boot-a-host-on-the-disk-image:8b7afac85e4821a1da5a25923e910783">Boot a host on the disk image</h2>
+
+<p>Boot it using DHCP, iPXE and the following iPXE script:</p>
+
+<pre><code>#!ipxe 
+initrd http://example.com/initrd0.img
+kernel http://example.com/vmlinuz0 initrd=/initrd0.img root=/centos64-pxe.iso rootfstype=auto rw liveimg toram size=4096
+boot
+</code></pre>
+
+<p>Note the size boot parameter. The patch will set the tmpfs size (in MB) according to this parameter. If the parameter is not set, 2048 is used as a default. The size can be changed runtime using mount, for example:</p>
+
+<pre><code>$ sudo mount -o remount,size=10G,rw /dev/root
+</code></pre>
+
+<h2 id="difference-in-memory-usage:8b7afac85e4821a1da5a25923e910783">Difference in memory usage</h2>
+
+<p>The files in the file system in our example will consume around 1 GB of disk space. When booting with a file system (tmpfs) size of 4 GB, the memory usage is quite different between the previous and this (Jeff’s) method:</p>
+
+<h3 id="previous-method:8b7afac85e4821a1da5a25923e910783">Previous method</h3>
+
+<p>The important thing to notice here is that the file system already have allocated 4 GB of memory. This is because the file system already is consuming the amount of memory equivalent to the given size of the file system, independently on the actual disk space being consumed by the files currently in the file system.</p>
+
+<pre><code>[root@lab-e ~]# free -m
+             total       used       free     shared    buffers     cached
+Mem:          7956       4272       3683          0          6       4135
+</code></pre>
+
+<p>One can argue that this is a waste of memory. On the other (conservative) side, one can argue that it is safest to pre-allocate the memory to reserve / ensure enough available memory to the file system should the system need it later. It depend on the use case, I guess.</p>
+
+<h3 id="this-method:8b7afac85e4821a1da5a25923e910783">This method</h3>
+
+<p>The memory footprint of the file system is equivalent of the size of the current files in the file system, which means that free disk space does not consume memory. In some scenarios, this may be a far better approach in terms of resource cost. You may however very well overbook too much, so be careful to leave sufficient memory available for new files to be added. If the file system tries to use more memory than what’s currently available, your system will crash.</p>
+
+<pre><code>             total       used       free     shared    buffers     cached
+Mem:          7956       1179       6777          0          0       1001
+</code></pre>
+
+<h2 id="difference-in-performance:8b7afac85e4821a1da5a25923e910783">Difference in performance</h2>
+
+<p>The following measurements are far from being scientifically valid.</p>
+
+<h3 id="previous-method-1:8b7afac85e4821a1da5a25923e910783">Previous method</h3>
+
+<pre><code>[root@lab-a ~]# time dd if=/dev/zero of=/foobar bs=1M count=2000 ; time sync
+2000+0 records in
+2000+0 records out
+2097152000 bytes (2.1 GB) copied, 2.45832 s, 853 MB/s
+
+real    0m2.480s
+user    0m0.003s
+sys 0m2.002s
+
+real    0m0.245s
+user    0m0.000s
+sys 0m0.037s
+</code></pre>
+
+<h3 id="this-method-1:8b7afac85e4821a1da5a25923e910783">This method</h3>
+
+<pre><code>[root@lab-e ~]# time dd if=/dev/zero of=/foobar bs=1M count=2000 ; time sync
+2000+0 records in
+2000+0 records out
+2097152000 bytes (2.1 GB) copied, 0.823305 s, 2.5 GB/s
+
+real    0m0.825s
+user    0m0.002s
+sys 0m0.821s
+
+real    0m0.001s
+user    0m0.000s
+sys 0m0.002s
+</code></pre>
+
+        <div id="disqus_thread"></div>
+<script type="text/javascript">
+
+(function() {
+    
+    
+    if (window.location.hostname == "localhost") 
+        return;
+
+    var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+    var disqus_shortname = 'espebra';
+    var disqus_identifier = 'CentOS\/RHEL\/SL 6: root filesystem on tmpfs, UPDATE #2';
+
+    dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+})();
+</script>
+<noscript>Please enable JavaScript to view the comments powered by <a href="http://disqus.com/?ref_noscript">Disqus.</a></noscript>
+
+      </div>
+    </div>
+  </body>
+</html>

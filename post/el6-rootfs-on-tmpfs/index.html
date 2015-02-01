@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
+<head>
+  <link href="http://gmpg.org/xfn/11" rel="profile">
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+
+  <title> CentOS/RHEL/SL 6: root filesystem on tmpfs &middot; Espen Braastad </title>
+
+  
+  <link rel="stylesheet" href="/css/poole.css">
+  <link rel="stylesheet" href="/css/syntax.css">
+  <link rel="stylesheet" href="/css/hyde.css">
+  <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=PT+Sans:400,400italic,700|Abril+Fatface">
+
+  
+  <link rel="stylesheet" href="/highlightjs/default.min.css">
+  <script src="/highlightjs/highlight.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script>
+
+  
+  <link rel="apple-touch-icon-precomposed" sizes="144x144" href="/apple-touch-icon-144-precomposed.png">
+  <link rel="shortcut icon" href="/favicon.ico">
+
+  
+  <link href="" rel="alternate" type="application/rss+xml" title="Espen Braastad" />
+
+  <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  
+    ga('create', 'UA-59220530-1', 'auto');
+    ga('send', 'pageview');
+  
+  </script>
+</head>
+
+  <body>
+
+    <div class="sidebar">
+  <div class="container sidebar-sticky">
+    <div class="sidebar-about">
+      <h1>Espen Braastad</h1>
+    </div>
+
+    <ul class="sidebar-nav">
+      <li><a href="/">Home</a> </li>
+      
+        <li><a href="/post">Posts</a></li>
+    </ul>
+  </div>
+</div>
+
+
+    <div class="content container">
+      <div class="post">
+        <h1>CentOS/RHEL/SL 6: root filesystem on tmpfs</h1>
+        <span class="post-date">Tue, May 1, 2012</span>
+        <p>UPDATE: The patch below has been updated <a href="/post/el6-rootfs-on-tmpfs-update">here</a>.</p>
+
+<p>There are several scenarios where conventional hard drives are not really needed. Examples are HPC cluster nodes, virtualization nodes, home theater streaming PCs, silent desktops, internet cafés and embedded systems. Hard drives tend to fail, they are slow, they consume power, they generate heat and noise, and they are quite expensive if you need/want something faster and more reliable than SATA.</p>
+
+<p>This post will show how to run CentOS 6 directly from tmpfs backed by memory, without using the (standard) 512 MB writable overlay. The procedure should be similar for RHEL and Scientific Linux 6.</p>
+
+<p>The resulting boot process will be:</p>
+
+<ul>
+<li>Boot a node off a PXE enabled DHCP server.</li>
+<li>Chainload into <a href="http://blog.braastad.org/?p=128">iPXE</a>.</li>
+<li>Download vmlinuz and a rather large initrd containing the entire filesystem over ftp/http(s). Try to avoid <a href="http://en.wikipedia.org/wiki/Trivial_File_Transfer_Protocol">TFTP</a> when downloading the initrd because of its file size limitation and slow transfer speeds.</li>
+<li>Once downloaded, the kernel will start and the initrd will be mounted.</li>
+<li>The modified dracut scripts in the initrd will create a tmpfs partition in memory with the same size as your filesystem image included in the initrd.</li>
+<li>Your entire filesystem image will be copied to the tmpfs partition and attached to a loop device.</li>
+<li>This loop device will be used as the new root device, and the boot process continues as usual.</li>
+</ul>
+
+<p>This is a screenshot from an ongoing boot process:
+<img src="/img/centos6-from-tmpfs1.png" alt="Boot process" />
+</p>
+
+<p>Now to the procedure:</p>
+
+<p>First, create a custom kickstart file. I&rsquo;ve included the specialties below:</p>
+
+<pre><code>bootloader --location=mbr --append=&quot;toram&quot;
+clearpart --all
+firstboot --disabled
+install
+lang en_US.UTF-8
+network --bootproto dhcp --device eth0 --onboot yes
+part / --fstype=ext4 --size=2048
+reboot
+zerombr
+
+%packages
+patch
+
+%post
+cat &gt; /etc/fstab &lt;&lt; END 
+tmpfs      /         tmpfs   defaults         0 0
+devpts     /dev/pts  devpts  gid=5,mode=620   0 0
+tmpfs      /dev/shm  tmpfs   defaults         0 0
+proc       /proc     proc    defaults         0 0
+sysfs      /sys      sysfs   defaults         0 0
+END
+
+# The patch is base64 encoded to avoid having to escape it manually.
+cat &gt; /root/dmsquash-live-root.base64 &lt;&lt; EOF_patch
+MjFhMjIKPiBnZXRhcmcgdG9yYW0gJiYgdG9yYW09InllcyIKMTM0YzEzNSwxMzgKPCAgICAgZG9f
+bGl2ZV9mcm9tX2Jhc2VfbG9vcAotLS0KPiAgICAgIyBDcmVhdGUgb3ZlcmxheSBvbmx5IGlmIHRv
+cmFtIGlzIG5vdCBzZXQKPiAgICAgaWYgWyAteiAiJHRvcmFtIiBdIDsgdGhlbgo+ICAgICAgICAg
+ZG9fbGl2ZV9mcm9tX2Jhc2VfbG9vcAo+ICAgICBmaQoxNjNjMTY3LDIxMwo8ICAgICBkb19saXZl
+X2Zyb21fYmFzZV9sb29wCi0tLQo+ICAgICAjIENyZWF0ZSBvdmVybGF5IG9ubHkgaWYgdG9yYW0g
+aXMgbm90IHNldAo+ICAgICBpZiBbIC16ICIkdG9yYW0iIF0gOyB0aGVuCj4gICAgICAgICBkb19s
+aXZlX2Zyb21fYmFzZV9sb29wCj4gICAgIGZpCj4gZmkKPiAKPiAjIEkgdGhlIGtlcm5lbCBwYXJh
+bWV0ZXIgdG9yYW0gaXMgc2V0LCBjcmVhdGUgYSB0bXBmcyBkZXZpY2UgYW5kIGNvcHkgdGhlIAo+
+ICMgZmlsZXN5c3RlbSB0byBpdC4gQ29udGludWUgdGhlIGJvb3QgcHJvY2VzcyB3aXRoIHRoaXMg
+dG1wZnMgZGV2aWNlIGFzCj4gIyBhIHdyaXRhYmxlIHJvb3QgZGV2aWNlLgo+IGlmIFsgLW4gIiR0
+b3JhbSIgXSA7IHRoZW4KPiAgICAgYmxvY2tzPSQoIGJsb2NrZGV2IC0tZ2V0c3ogJEJBU0VfTE9P
+UERFViApCj4gCj4gICAgIGVjaG8gIkNyZWF0ZSB0bXBmcyAoJGJsb2NrcyBibG9ja3MpIGZvciB0
+aGUgcm9vdCBmaWxlc3lzdGVtLi4uIgo+ICAgICBta2RpciAtcCAvaW1hZ2UKPiAgICAgbW91bnQg
+LW4gLXQgdG1wZnMgLW8gbnJfYmxvY2tzPSRibG9ja3MgdG1wZnMgL2ltYWdlCj4gCj4gICAgIGVj
+aG8gIkNvcHkgZmlsZXN5c3RlbSBpbWFnZSB0byB0bXBmcy4uLiAodGhpcyBtYXkgdGFrZSBhIGZl
+dyBtaW51dGVzKSIKPiAgICAgZGQgaWY9JEJBU0VfTE9PUERFViBvZj0vaW1hZ2Uvcm9vdGZzLmlt
+Zwo+IAo+ICAgICBST09URlNfTE9PUERFVj0kKCBsb3NldHVwIC1mICkKPiAgICAgZWNobyAiQ3Jl
+YXRlIGxvb3AgZGV2aWNlIGZvciB0aGUgcm9vdCBmaWxlc3lzdGVtOiAkUk9PVEZTX0xPT1BERVYi
+Cj4gICAgIGxvc2V0dXAgJFJPT1RGU19MT09QREVWIC9pbWFnZS9yb290ZnMuaW1nCj4gCj4gICAg
+IGVjaG8gIkl0J3MgdGltZSB0byBjbGVhbiB1cC4uICIKPiAKPiAgICAgZWNobyAiID4gVW1vdW50
+aW5nIGltYWdlcyIKPiAgICAgdW1vdW50IC1sIC9pbWFnZQo+ICAgICB1bW91bnQgLWwgL2Rldi8u
+aW5pdHJhbWZzL2xpdmUKPiAKPiAgICAgZWNobyAiID4gRGV0YWNoICRPU01JTl9MT09QREVWIgo+
+ICAgICBsb3NldHVwIC1kICRPU01JTl9MT09QREVWCj4gCj4gICAgIGVjaG8gIiA+IERldGFjaCAk
+T1NNSU5fU1FVQVNIRURfTE9PUERFViIKPiAgICAgbG9zZXR1cCAtZCAkT1NNSU5fU1FVQVNIRURf
+TE9PUERFVgo+ICAgICAKPiAgICAgZWNobyAiID4gRGV0YWNoICRCQVNFX0xPT1BERVYiCj4gICAg
+IGxvc2V0dXAgLWQgJEJBU0VfTE9PUERFVgo+ICAgICAKPiAgICAgZWNobyAiID4gRGV0YWNoICRT
+UVVBU0hFRF9MT09QREVWIgo+ICAgICBsb3NldHVwIC1kICRTUVVBU0hFRF9MT09QREVWCj4gCj4g
+ICAgIGVjaG8gIlJvb3QgZmlsZXN5c3RlbSBpcyBub3cgb24gJFJPT1RGU19MT09QREVWLiIKPiAg
+ICAgZWNobwo+IAo+ICAgICBsbiAtcyAkUk9PVEZTX0xPT1BERVYgL2Rldi9yb290Cj4gICAgIHBy
+aW50ZiAnL2Jpbi9tb3VudCAtbyBydyAlcyAlc1xuJyAiJFJPT1RGU19MT09QREVWIiAiJE5FV1JP
+T1QiID4gL21vdW50LzAxLSQkLWxpdmUuc2gKPiAgICAgZXhpdCAwCjE2OWMyMTksMjIxCjwgICAg
+IGVjaG8gIjAgJCggYmxvY2tkZXYgLS1nZXRzeiAkQkFTRV9MT09QREVWICkgc25hcHNob3QgJEJB
+U0VfTE9PUERFViAkT1NNSU5fTE9PUERFViBwIDgiIHwgZG1zZXR1cCBjcmVhdGUgLS1yZWFkb25s
+eSBsaXZlLW9zaW1nLW1pbgotLS0KPiAgICAgaWYgWyAteiAiJHRvcmFtIiBdIDsgdGhlbgo+ICAg
+ICAgICAgZWNobyAiMCAkKCBibG9ja2RldiAtLWdldHN6ICRCQVNFX0xPT1BERVYgKSBzbmFwc2hv
+dCAkQkFTRV9MT09QREVWICRPU01JTl9MT09QREVWIHAgOCIgfCBkbXNldHVwIGNyZWF0ZSAtLXJl
+YWRvbmx5IGxpdmUtb3NpbWctbWluCj4gICAgIGZpCg==
+EOF_patch
+
+cat /root/dmsquash-live-root.base64 | base64 -d &gt; /root/dmsquash-live-root.patch
+
+patch /usr/share/dracut/modules.d/90dmsquash-live/dmsquash-live-root /root/dmsquash-live-root.patch
+
+ls /lib/modules | while read kernel; do
+  echo &quot; &gt; Update initramfs for kernel ${kernel}&quot;
+  initrdfile=&quot;/boot/initramfs-${kernel}.img&quot;
+
+  /sbin/dracut -f $initrdfile $kernel
+done
+%end
+
+%post --nochroot
+
+echo &quot;Copy initramfs outside the chroot:&quot;
+ls $INSTALL_ROOT/lib/modules | while read kernel; do
+  src=&quot;$INSTALL_ROOT/boot/initramfs-${kernel}.img&quot;
+  dst=&quot;$LIVE_ROOT/isolinux/initrd0.img&quot;
+  echo &quot; &gt; $src -&gt; $dst&quot;
+  cp -f $src $dst
+done
+%end
+</code></pre>
+
+<p><b>Explaination:</b> The post script will apply a patch to <i>/usr/share/dracut/modules.d/90dmsquash-live/dmsquash-live-root</i> before regenerating the initramfs. This patch will add support for the &lsquo;toram&rsquo; boot parameter. Then, the initramfs is being copied to the isolinux directory outside the filesystem image.</p>
+
+<p>Second, use <i>livecd-creator</i> and <i>livecd-iso-to-pxeboot</i> from the <i>livecd-tools</i> package to convert the kickstart file into a bootable vmlinuz and initrd:</p>
+
+<pre><code>$ sudo livecd-creator --config=centos6.ks fslabel=centos6
+$ sudo livecd-iso-to-pxeboot centos6.iso
+</code></pre>
+
+<p>The commands above will create <i>tftpboot/vmlinuz0</i> and <i>tftpboot/initrd0.img</i>. Put these files on your boot server and create a suitable PXE configuration. <i>livecd-iso-to-pxeboot</i> will create <i>tftpboot/pxelinux.cfg/default</i> which can be used as a template.</p>
+
+<p>Now you are ready to boot one or multiple CentOS 6 in-memory instances over the network!</p>
+
+<p>Another screenshot:
+<img src="/img/centos6-from-tmpfs-details.png" alt="losetup" />
+</p>
+
+<p>Feature request <a href="http://article.gmane.org/gmane.linux.kernel.initramfs/2588">upstream</a>.</p>
+
+        <div id="disqus_thread"></div>
+<script type="text/javascript">
+
+(function() {
+    
+    
+    if (window.location.hostname == "localhost") 
+        return;
+
+    var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+    var disqus_shortname = 'espebra';
+    var disqus_identifier = 'CentOS\/RHEL\/SL 6: root filesystem on tmpfs';
+
+    dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+})();
+</script>
+<noscript>Please enable JavaScript to view the comments powered by <a href="http://disqus.com/?ref_noscript">Disqus.</a></noscript>
+
+      </div>
+    </div>
+  </body>
+</html>

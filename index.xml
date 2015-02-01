@@ -1,0 +1,752 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Espen Braastad</title>
+    <link>/</link>
+    <description>Recent content on Espen Braastad</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <author>Espen Braastad</author>
+    
+    <lastBuildDate>Sat, 30 Aug 2014 20:48:00 &#43;0100</lastBuildDate>
+    <atom:link href="/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Remote console on HP ProLiant MicroServer G7 N54L</title>
+      <link>/post/remote-console-on-hp-proliant-microserver-g7-n54l/</link>
+      <pubDate>Sat, 30 Aug 2014 20:48:00 &#43;0100</pubDate>
+      <author>Espen Braastad</author>
+      <guid>/post/remote-console-on-hp-proliant-microserver-g7-n54l/</guid>
+      <description>&lt;p&gt;I bought the &lt;a href=&#34;http://www8.hp.com/us/en/products/proliant-servers/product-detail.html?oid=6280786&#34;&gt;HP ProLiant MicroServer G7 N54L&lt;/a&gt; a while ago. I threw in a &lt;a href=&#34;http://www8.hp.com/us/en/products/oas/product-detail.html?oid=4275612&#34;&gt;HP MicroServer Remote Access Card Kit&lt;/a&gt; to get remote console and power management. While the power management, web UI and CLI (over ssh) works fine out of the box, the remote console (KVM) does not. What happens is that the KVM client shows the following &lt;code&gt;Out of range&lt;/code&gt; message:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;/img/outofrange.png&#34; alt=&#34;Out of range&#34; /&gt;
+&lt;/p&gt;
+
+&lt;p&gt;To fix this, go into the BIOS. Navigate to Advanced, PCI Express Configuration and Embedded VGA Control like this:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;/img/bios1.png&#34; alt=&#34;BIOS 1&#34; /&gt;
+
+&lt;img src=&#34;/img/bios2.png&#34; alt=&#34;BIOS 2&#34; /&gt;
+&lt;/p&gt;
+
+&lt;p&gt;Flip from &amp;ldquo;Always enabled&amp;rdquo; (default) to &amp;ldquo;Auto Detect&amp;rdquo;. Save and quit. Then, make sure that your monitor is connected to the VGA port on the RAC instead of the embedded VGA port.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Altibox, TV- og datatrafikk over samme nettverkskabel</title>
+      <link>/post/altibox-tv-and-data-over-the-same-ethernet-cable/</link>
+      <pubDate>Thu, 22 May 2014 22:41:00 &#43;0100</pubDate>
+      <author>Espen Braastad</author>
+      <guid>/post/altibox-tv-and-data-over-the-same-ethernet-cable/</guid>
+      <description>&lt;p&gt;Altibox leverer en hjemmesentral hvor man henter ut TV-signal og internettilgang fra to (eller flere) forskjellige RJ45-porter. Som trådløs router har hjemmesentralen kun et minimum av funksjonalitet, og man skal ikke være en veldig avansert bruker før man vil rekonfigurere hjemmesentralen som en bridge og heller ha en egen trådløs router på baksiden. Dette gir også mening dersom boligen har flere etasjer, og hjemmesentralen ikke er kraftig nok til å levere god nok trådløs dekning.&lt;/p&gt;
+
+&lt;p&gt;Denne posten viser hvordan TV og datatrafikk kan sendes via èn nettverkskabel til et annet sted i boligen ved hjelp av to stk Mikrotik 951G-2HnD. RB951G-2HnD er en fleksibel trådløs router (2,4 GHz) med 5 stk 1 Gbps-porter beregnet på hjemmebruk. Utstyret kobles som skjemaet under viser.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;/img/mikrotik-altibox.png&#34; alt=&#34;Diagram&#34; /&gt;
+&lt;/p&gt;
+
+&lt;p&gt;Mikrotik A, konfigurasjon:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;/interface vlan add name=vlan-10 vlan-id=10 interface=ether2 disabled=no
+/interface bridge add name=br-vlan10 disabled=no
+/interface bridge port add interface=&amp;quot;vlan-10&amp;quot; bridge=&amp;quot;br-vlan10&amp;quot; disabled=no
+/interface ethernet set numbers=ether5-slave-local master-port=none
+/interface bridge port add interface=&amp;quot;ether5-slave-local&amp;quot; bridge=&amp;quot;br-vlan10&amp;quot; disabled=no
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Mikrotik A, portoversikt:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;Port 1: Internett inn (datakabel fra Altibox hjemmesentral)
+Port 2: Trunk til Mikrotik B
+Port 3: Data
+Port 4: Data
+Port 5: TV inn (TV-kabel fra Altibox hjemmesentral)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Mikrotik B, konfigurasjon:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;/interface vlan add name=vlan-10 vlan-id=10 interface=ether2 disabled=no
+/interface bridge add name=br-vlan10 disabled=no
+/interface bridge port add interface=&amp;quot;vlan-10&amp;quot; bridge=&amp;quot;br-vlan10&amp;quot; disabled=no
+/interface ethernet set numbers=ether4-slave-local master-port=none
+/interface ethernet set numbers=ether5-slave-local master-port=none
+/interface bridge port add interface=&amp;quot;ether4-slave-local&amp;quot; bridge=&amp;quot;br-vlan10&amp;quot; disabled=no
+/interface bridge port add interface=&amp;quot;ether5-slave-local&amp;quot; bridge=&amp;quot;br-vlan10&amp;quot; disabled=no
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;I tillegg må Mikrotik B settes opp som en bridge.&lt;/p&gt;
+
+&lt;p&gt;Mikrotik B, portoversikt:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;Port 1: Data
+Port 2: Trunk til Mikrotik A
+Port 3: Data
+Port 4: TV ut
+Port 5: TV ut
+&lt;/code&gt;&lt;/pre&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Temperature trend monitoring at home</title>
+      <link>/post/temperature-trend-monitoring-at-home/</link>
+      <pubDate>Wed, 19 Feb 2014 23:32:00 CET</pubDate>
+      <author>Espen Braastad</author>
+      <guid>/post/temperature-trend-monitoring-at-home/</guid>
+      <description>
+
+&lt;h2 id=&#34;background:88f8b93192da3e559035b25b4d4944bf&#34;&gt;Background&lt;/h2&gt;
+
+&lt;p&gt;I’ve got balanced ventilation in my apartment. It works OK, but I don’t fully understand how it behaves if knobs are pushed and pots are turned, and I’m definitely not sure if its performance is as good as I should expect.&lt;/p&gt;
+
+&lt;p&gt;I’m going to do some measurements to see how the system reacts to changes in the outside temperature and tuning of the various settings. The first parameter to measure is the temperature in the air intake, exhaust air and some of the ventilation valves in the different rooms in the apartment.&lt;/p&gt;
+
+&lt;h2 id=&#34;hardware:88f8b93192da3e559035b25b4d4944bf&#34;&gt;Hardware&lt;/h2&gt;
+
+&lt;p&gt;Some temperature sensors are required. Price is an important factor, but so is accuracy. I settled with some sensors from the &lt;a href=&#34;http://www.raphnet.net/electronique/usbtenki/index_en.php&#34;&gt;USBTenki&lt;/a&gt; project. Schematics and software are open source, so you can assemble the sensors yourself if you want to. I didn’t want to, so I bought them ready to run from &lt;a href=&#34;http://www.dracal.com/store/products/usbtenki/index.php&#34;&gt;Dracal&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;/img/usbtenki_sensor_on_table.png&#34; alt=&#34;Sensor&#34; /&gt;
+&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;±0.5°C typical accuracy at 25°C&lt;/li&gt;
+&lt;li&gt;±1°C (max.) accuracy from -10°C to +85°C&lt;/li&gt;
+&lt;li&gt;±2°C (max.) accuracy from -10°C to +125°C&lt;/li&gt;
+&lt;li&gt;±3°C (max.) accuracy from -55°C to +125°C&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;The price is 29.99$ CAD per sensor and they ship internationally. I bought five sensors. In addition, I bought some USB extension cords and a cheap bus powered USB hub from &lt;a href=&#34;http://www.dx.com/&#34;&gt;Deal Extreme&lt;/a&gt; to allow all sensors to be connected simultaneously.&lt;/p&gt;
+
+&lt;h2 id=&#34;software:88f8b93192da3e559035b25b4d4944bf&#34;&gt;Software&lt;/h2&gt;
+
+&lt;p&gt;&lt;a href=&#34;http://munin-monitoring.org/&#34;&gt;Munin&lt;/a&gt; will be used to create graphs to show the temperature over time:&lt;/p&gt;
+
+&lt;p&gt;Munin is a networked resource monitoring tool that can help analyze resource trends and “what just happened to kill our performance?” problems. It is designed to be very plug and play. A default installation provides a lot of graphs with almost no work.&lt;/p&gt;
+
+&lt;p&gt;Munin is written in Perl and is available in the repositories of most Linux distributions. Installation is easy:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;# Fedora / Redhat / CentOS
+sudo yum install munin munin-node
+
+# Debian / Ubuntu
+sudo apt-get install munin munin-node
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;USBTenki host software is used to communicate with the sensors from Linux.&lt;/p&gt;
+
+&lt;h2 id=&#34;setup:88f8b93192da3e559035b25b4d4944bf&#34;&gt;Setup&lt;/h2&gt;
+
+&lt;p&gt;A couple of the sensors are mounted in the ventilation tubes for permanent monitoring, and the other ones are used for temporary monitoring at various locations.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;/img/usbtenki_sensor_mounted.png&#34; alt=&#34;Sensor&#34; /&gt;
+&lt;/p&gt;
+
+&lt;p&gt;Since the number of sensors and the locations will vary, I need a munin plugin that is flexible. I wrote a simple multigraph plugin that will detect new sensors and create a new graph per sensor that is added. These graphs are completely standardised and (frankly) pretty boring:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;/img/sensor_905270-week.png&#34; alt=&#34;Sensor&#34; /&gt;
+
+&lt;img src=&#34;/img/sensor_E10084-week.png&#34; alt=&#34;Sensor&#34; /&gt;
+
+&lt;img src=&#34;/img/sensor_E10087-week.png&#34; alt=&#34;Sensor&#34; /&gt;
+&lt;/p&gt;
+
+&lt;p&gt;Data loaning is used to aggregate the different sensor data and to modify their presentation (type, colour, label, etc) as I see fit, without having to modify the plugin itself. This will ensure that old sensor data is kept whenever modifications are made, and the data from each sensor can be used in multiple aggregated graphs if needed.&lt;/p&gt;
+
+&lt;p&gt;Data loaning configuration example and result:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;[sensor;ventilation]
+    address 127.0.0.1
+    use_node_name no
+    temp.update no
+    temp.graph_title Temperature
+    temp.graph_args --base 1000
+    temp.graph_vlabel Celcius
+    temp.graph_scale no
+    temp.graph_category temperature
+    temp.graph_order \
+        E10084=oslo;caesar:sensor_E10084.output \
+        E10090=oslo;caesar:sensor_E10090.output \
+        E10087=oslo;caesar:sensor_E10087.output 
+    temp.E10084.draw LINE1
+    temp.E10084.colour FF00FF
+    temp.E10084.label Air exhaust (inside)
+    temp.E10087.draw LINE1
+    temp.E10087.colour FF0000
+    temp.E10087.label Air intake (outside)
+    temp.E10090.draw LINE1
+    temp.E10090.colour 00FF00
+    temp.E10090.label Air intake (inside)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;img src=&#34;/img/temp-week.png&#34; alt=&#34;Aggregated, by week&#34; /&gt;
+&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;/img/temp-day.png&#34; alt=&#34;Aggregated, by day&#34; /&gt;
+&lt;/p&gt;
+
+&lt;p&gt;Air flow, carbon dioxide, humidity and power consumption are other aspects that are interesting to monitor as well, but those will have to wait until I find reasonably priced sensors with satisfying accuracy and quality.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>CentOS/RHEL/SL 6: root filesystem on tmpfs, UPDATE #2</title>
+      <link>/post/el6-rootfs-on-tmpfs-update2/</link>
+      <pubDate>Sun, 23 Jun 2013 21:44:19 &#43;0100</pubDate>
+      <author>Espen Braastad</author>
+      <guid>/post/el6-rootfs-on-tmpfs-update2/</guid>
+      <description>
+
+&lt;p&gt;In a &lt;a href=&#34;/post/el6-rootfs-on-tmpfs&#34;&gt;previous post&lt;/a&gt;, I’ve explained how to boot EL6 from memory without having / needing a physical disk.&lt;/p&gt;
+
+&lt;p&gt;A bright reader, Jeff, came up with an alternative method. This alternative method does not involve dd’ing the image into a loop device, but instead copying the contents of the disk image directly into tmpfs. The result is higher write/read performance and generally lower memory requirements. The latter because unused disk space does not consume memory, which is important to consider when choosing the method to use in production systems.&lt;/p&gt;
+
+&lt;h2 id=&#34;example:8b7afac85e4821a1da5a25923e910783&#34;&gt;Example&lt;/h2&gt;
+
+&lt;p&gt;I got a lot of questions by e-mail on the previous posts regarding the subject and how to actually getting it to work, so this time I’ve created a complete set of files to get you going with Jeff’s method:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;The original &lt;code&gt;dmsquash-live-root&lt;/code&gt;. You won’t need this, but I added it as a reference.&lt;/li&gt;
+&lt;li&gt;The updated &lt;code&gt;dmsquash-live-root&lt;/code&gt;. You might need to look at this to understand what is going on.&lt;/li&gt;
+&lt;li&gt;The patch which is the diff of the two previous files. This one is used in the kickstart file below as a base64 encoded string.&lt;/li&gt;
+&lt;li&gt;The complete example kickstart file. This is a rather default CentOS 6.4 x86_64. The root password is being set to ‘foobar’.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&#34;build-the-disk-image:8b7afac85e4821a1da5a25923e910783&#34;&gt;Build the disk image&lt;/h2&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo yum install livecd-tools
+$ sudo livecd-creator --config=centos64-pxe.ks --fslabel=centos64-pxe
+$ sudo livecd-iso-to-pxeboot centos64-pxe.iso
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;The last command will output &lt;code&gt;vmlinuz0&lt;/code&gt; and &lt;code&gt;initrd0.img&lt;/code&gt;. Put these on your webserver, &lt;a href=&#34;http://example.com/&#34;&gt;http://example.com/&lt;/a&gt;.&lt;/p&gt;
+
+&lt;h2 id=&#34;boot-a-host-on-the-disk-image:8b7afac85e4821a1da5a25923e910783&#34;&gt;Boot a host on the disk image&lt;/h2&gt;
+
+&lt;p&gt;Boot it using DHCP, iPXE and the following iPXE script:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;#!ipxe 
+initrd http://example.com/initrd0.img
+kernel http://example.com/vmlinuz0 initrd=/initrd0.img root=/centos64-pxe.iso rootfstype=auto rw liveimg toram size=4096
+boot
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Note the size boot parameter. The patch will set the tmpfs size (in MB) according to this parameter. If the parameter is not set, 2048 is used as a default. The size can be changed runtime using mount, for example:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo mount -o remount,size=10G,rw /dev/root
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;difference-in-memory-usage:8b7afac85e4821a1da5a25923e910783&#34;&gt;Difference in memory usage&lt;/h2&gt;
+
+&lt;p&gt;The files in the file system in our example will consume around 1 GB of disk space. When booting with a file system (tmpfs) size of 4 GB, the memory usage is quite different between the previous and this (Jeff’s) method:&lt;/p&gt;
+
+&lt;h3 id=&#34;previous-method:8b7afac85e4821a1da5a25923e910783&#34;&gt;Previous method&lt;/h3&gt;
+
+&lt;p&gt;The important thing to notice here is that the file system already have allocated 4 GB of memory. This is because the file system already is consuming the amount of memory equivalent to the given size of the file system, independently on the actual disk space being consumed by the files currently in the file system.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;[root@lab-e ~]# free -m
+             total       used       free     shared    buffers     cached
+Mem:          7956       4272       3683          0          6       4135
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;One can argue that this is a waste of memory. On the other (conservative) side, one can argue that it is safest to pre-allocate the memory to reserve / ensure enough available memory to the file system should the system need it later. It depend on the use case, I guess.&lt;/p&gt;
+
+&lt;h3 id=&#34;this-method:8b7afac85e4821a1da5a25923e910783&#34;&gt;This method&lt;/h3&gt;
+
+&lt;p&gt;The memory footprint of the file system is equivalent of the size of the current files in the file system, which means that free disk space does not consume memory. In some scenarios, this may be a far better approach in terms of resource cost. You may however very well overbook too much, so be careful to leave sufficient memory available for new files to be added. If the file system tries to use more memory than what’s currently available, your system will crash.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;             total       used       free     shared    buffers     cached
+Mem:          7956       1179       6777          0          0       1001
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;difference-in-performance:8b7afac85e4821a1da5a25923e910783&#34;&gt;Difference in performance&lt;/h2&gt;
+
+&lt;p&gt;The following measurements are far from being scientifically valid.&lt;/p&gt;
+
+&lt;h3 id=&#34;previous-method-1:8b7afac85e4821a1da5a25923e910783&#34;&gt;Previous method&lt;/h3&gt;
+
+&lt;pre&gt;&lt;code&gt;[root@lab-a ~]# time dd if=/dev/zero of=/foobar bs=1M count=2000 ; time sync
+2000+0 records in
+2000+0 records out
+2097152000 bytes (2.1 GB) copied, 2.45832 s, 853 MB/s
+
+real    0m2.480s
+user    0m0.003s
+sys 0m2.002s
+
+real    0m0.245s
+user    0m0.000s
+sys 0m0.037s
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;this-method-1:8b7afac85e4821a1da5a25923e910783&#34;&gt;This method&lt;/h3&gt;
+
+&lt;pre&gt;&lt;code&gt;[root@lab-e ~]# time dd if=/dev/zero of=/foobar bs=1M count=2000 ; time sync
+2000+0 records in
+2000+0 records out
+2097152000 bytes (2.1 GB) copied, 0.823305 s, 2.5 GB/s
+
+real    0m0.825s
+user    0m0.002s
+sys 0m0.821s
+
+real    0m0.001s
+user    0m0.000s
+sys 0m0.002s
+&lt;/code&gt;&lt;/pre&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>CentOS/RHEL/SL 6: root filesystem on tmpfs, UPDATE</title>
+      <link>/post/el6-rootfs-on-tmpfs-update/</link>
+      <pubDate>Thu, 21 Mar 2013 09:57:00 CET</pubDate>
+      <author>Espen Braastad</author>
+      <guid>/post/el6-rootfs-on-tmpfs-update/</guid>
+      <description>&lt;p&gt;In EL6.4, the file &lt;code&gt;/usr/share/dracut/modules.d/90dmsquash-live/dmsquash-live-root&lt;/code&gt; was updated so that the &lt;a href=&#34;/post/el6-rootfs-on-tmpfs&#34;&gt;previous patch&lt;/a&gt; no longer works as it should. I’ve updated the patch, and here it is:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;--- original    2013-03-20 16:25:23.698846581 +0100
++++ new 2013-03-21 08:58:11.175339694 +0100
+@@ -24,6 +24,8 @@
+ getarg readonly_overlay &amp;amp;&amp;amp; readonly_overlay=&amp;quot;--readonly&amp;quot; || readonly_overlay=&amp;quot;&amp;quot;
+ overlay=$(getarg overlay)
+
++getarg toram &amp;amp;&amp;amp; toram=&amp;quot;yes&amp;quot;
++
+ # FIXME: we need to be able to hide the plymouth splash for the check really
+ [ -e $livedev ] &amp;amp; fs=$(blkid -s TYPE -o value $livedev)
+ if [ &amp;quot;$fs&amp;quot; = &amp;quot;iso9660&amp;quot; -o &amp;quot;$fs&amp;quot; = &amp;quot;udf&amp;quot; ]; then
+@@ -132,7 +134,10 @@
+     BASE_LOOPDEV=$( losetup -f )
+     losetup -r $BASE_LOOPDEV $EXT3FS
+
+-    do_live_from_base_loop
++    # Create overlay only if toram is not set
++    if [ -z &amp;quot;$toram&amp;quot; ] ; then
++        do_live_from_base_loop
++    fi
+ fi
+
+ # we might have an embedded ext3 on squashfs to use as rootfs (compressed live)
+@@ -163,13 +168,66 @@
+
+     umount -l /squashfs
+
+-    do_live_from_base_loop
++    # Create overlay only if toram is not set
++    if [ -z &amp;quot;$toram&amp;quot; ] ; then
++        do_live_from_base_loop
++    fi
++fi
++
++# If the kernel parameter toram is set, create a tmpfs device and copy the 
++# filesystem to it. Continue the boot process with this tmpfs device as
++# a writable root device.
++if [ -n &amp;quot;$toram&amp;quot; ] ; then
++    blocks=$( blockdev --getsz $BASE_LOOPDEV )
++
++    echo &amp;quot;Create tmpfs ($blocks blocks) for the root filesystem...&amp;quot;
++    mkdir -p /image
++    mount -n -t tmpfs -o nr_blocks=$blocks tmpfs /image
++
++    echo &amp;quot;Copy filesystem image to tmpfs... (this may take a few minutes)&amp;quot;
++    dd if=$BASE_LOOPDEV of=/image/rootfs.img
++
++    ROOTFS_LOOPDEV=$( losetup -f )
++    echo &amp;quot;Create loop device for the root filesystem: $ROOTFS_LOOPDEV&amp;quot;
++    losetup $ROOTFS_LOOPDEV /image/rootfs.img
++
++    echo &amp;quot;It&#39;s time to clean up.. &amp;quot;
++
++    echo &amp;quot; &amp;gt; Umounting images&amp;quot;
++    umount -l /image
++    umount -l /dev/.initramfs/live
++
++    echo &amp;quot; &amp;gt; Detach $OSMIN_LOOPDEV&amp;quot;
++    losetup -d $OSMIN_LOOPDEV
++
++    echo &amp;quot; &amp;gt; Detach $OSMIN_SQUASHED_LOOPDEV&amp;quot;
++    losetup -d $OSMIN_SQUASHED_LOOPDEV
++    
++    echo &amp;quot; &amp;gt; Detach $BASE_LOOPDEV&amp;quot;
++    losetup -d $BASE_LOOPDEV
++    
++    echo &amp;quot; &amp;gt; Detach $SQUASHED_LOOPDEV&amp;quot;
++    losetup -d $SQUASHED_LOOPDEV
++    
++    echo &amp;quot; &amp;gt; Detach /dev/loop0&amp;quot;
++    losetup -d /dev/loop0
++
++    losetup -a
++
++    echo &amp;quot;Root filesystem is now on $ROOTFS_LOOPDEV.&amp;quot;
++    echo
++
++    ln -s $ROOTFS_LOOPDEV /dev/root
++    printf &#39;/bin/mount -o rw %s %s\n&#39; &amp;quot;$ROOTFS_LOOPDEV&amp;quot; &amp;quot;$NEWROOT&amp;quot; &amp;gt; /mount/01-$$-live.sh
++    exit 0
+ fi
+
+ if [ -b &amp;quot;$OSMIN_LOOPDEV&amp;quot; ]; then
+     # set up the devicemapper snapshot device, which will merge
+     # the normal live fs image, and the delta, into a minimzied fs image
+-    echo &amp;quot;0 $( blockdev --getsz $BASE_LOOPDEV ) snapshot $BASE_LOOPDEV $OSMIN_LOOPDEV p 8&amp;quot; | dmsetup create --readonly live-osimg-min
++    if [ -z &amp;quot;$toram&amp;quot; ] ; then
++        echo &amp;quot;0 $( blockdev --getsz $BASE_LOOPDEV ) snapshot $BASE_LOOPDEV $OSMIN_LOOPDEV p 8&amp;quot; | dmsetup create --readonly live-osimg-min
++    fi
+ fi
+
+ ROOTFLAGS=&amp;quot;$(getarg rootflags)&amp;quot;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;It may be easier to download it from &lt;a href=&#34;/resources/patch.sl64.txt&#34;&gt;here&lt;/a&gt;.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>KVM/Xen and libvirt: currentMemory, memory and ballooning. Where did my memory go?</title>
+      <link>/post/memory-ballooning/</link>
+      <pubDate>Mon, 24 Sep 2012 16:58:32 &#43;0100</pubDate>
+      <author>Espen Braastad</author>
+      <guid>/post/memory-ballooning/</guid>
+      <description>&lt;p&gt;KVM and Xen provide a method to change the amount of memory in use by guests at runtime. The method is called memory ballooning [&lt;a href=&#34;http://www.linux-kvm.org/page/FAQ#Is_dynamic_memory_management_for_guests_supported.3F&#34;&gt;1&lt;/a&gt;, &lt;a href=&#34;http://rwmj.wordpress.com/2010/07/17/virtio-balloon&#34;&gt;2&lt;/a&gt;], and it must be supported by the guest operating system to work.&lt;/p&gt;
+
+&lt;p&gt;In libvirt, memory allocation (and hence the ballooning capability) for a guest can be configured using the &lt;code&gt;memory&lt;/code&gt;, &lt;code&gt;currentMemory&lt;/code&gt; and &lt;code&gt;memballoon&lt;/code&gt; tags:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;&amp;lt;domain type=&#39;kvm&#39;&amp;gt;
+  [...]
+  &amp;lt;memory unit=&#39;KiB&#39;&amp;gt;16777216&amp;lt;/memory&amp;gt;
+  &amp;lt;currentMemory unit=&#39;KiB&#39;&amp;gt;1048576&amp;lt;/currentMemory&amp;gt;
+  [...]
+  &amp;lt;devices&amp;gt;
+    &amp;lt;memballoon model=&#39;virtio&#39;/&amp;gt;
+  &amp;lt;/devices&amp;gt;
+&amp;lt;/domain&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;The guest can never use more memory than specified in the &lt;code&gt;memory&lt;/code&gt; tag and it is the amount of memory the guest will use at boot time. The &lt;code&gt;currentMemory&lt;/code&gt; tag, if set, should be less than or equal (default) to &lt;code&gt;memory&lt;/code&gt;. The guest will, when the balloon driver is loaded some time during the boot process, adjust itself to use the amount of memory specified by &lt;code&gt;currentMemory&lt;/code&gt;. The &lt;code&gt;memballoon&lt;/code&gt; tag is being added automatically, so there is really no need to specify it.&lt;/p&gt;
+
+&lt;p&gt;The command line tool &lt;code&gt;virsh&lt;/code&gt; can later be used on the host to see the current memory configuration for each guest:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;[root@host ~]# virsh dominfo guest
+Id:             -
+Name:           guest
+UUID:           4f610a1f-7539-47cf-8299-9534500b340d
+OS Type:        hvm
+State:          shut off
+CPU(s):         1
+Max memory:     16777216 kB
+Used memory:    1048576 kB
+Persistent:     yes
+Autostart:      disable
+Managed save:   no
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;So far, so good. At this point it makes sense to set &lt;code&gt;memory&lt;/code&gt; really high on all guests to ensure that we are able to reallocate memory on the fly for all our Linux guests. Doing this might not be a good idea.&lt;/p&gt;
+
+&lt;p&gt;Linux as a guest, even though it has a balloon driver, does not seem to behave like one would expect. When &lt;code&gt;memory&lt;/code&gt; is set higher than &lt;code&gt;currentMemory&lt;/code&gt;, the guest operating system does not see (or use) the amount of memory that it should. Ideally, the value that libvirt reports as Used memory at the host should be visible inside the guest also.&lt;/p&gt;
+
+&lt;p&gt;The graphs below show different guests (RHEL6, SL6 and Ubuntu Precise) on KVM (SL6) and Xen (RHEL5). The Y-axis show the amount of memory visible inside the guest (as reported by &lt;code&gt;free -m&lt;/code&gt;), while the X-axis show the value of memory. The value of currentMemory is 1024M in all plots – which means that the guests should use 1024M of memory and that the graphs should stay flat out at 1024M, given zero overhead. The graphs show that this is not the reality.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;/img/kvm-precise-1024.png&#34; alt=&#34;KVM, Ubuntu Precise, 1024 MB ram&#34; /&gt;
+&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;/img/kvm-rhel6-1024.png&#34; alt=&#34;KVM, RHEL6, 1024 MB ram&#34; /&gt;
+&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;/img/xen-sl6-1024.png&#34; alt=&#34;Xen, SL6, 1024 MB ram&#34; /&gt;
+&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;/img/xen-precise-1024.png&#34; alt=&#34;Xen, Ubuntu Precise, 1024 MB ram&#34; /&gt;
+&lt;/p&gt;
+
+&lt;p&gt;The graphs with KVM do not have values for 32G memory because the guests went ballistic and OOM-ed.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Filebin available on http://filebin.net</title>
+      <link>/post/filebin-available/</link>
+      <pubDate>Fri, 27 Jul 2012 22:10:29 &#43;0100</pubDate>
+      <author>Espen Braastad</author>
+      <guid>/post/filebin-available/</guid>
+      <description>&lt;p&gt;&lt;a href=&#34;http://filebin.net&#34;&gt;Filebin.net&lt;/a&gt; was created to try out the new &lt;a href=&#34;http://www.w3.org/TR/FileAPI/&#34;&gt;File API&lt;/a&gt; features in HTML5.&lt;/p&gt;
+
+&lt;p&gt;Filebin is a web application that is somewhat similar to a pastebin, except that it&amp;rsquo;s for files. It is written in Python, and the code is available on &lt;a href=&#34;http://github.com/espebra/filebin&#34;&gt;Github&lt;/a&gt;.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>CentOS/RHEL/SL 6: root filesystem on tmpfs</title>
+      <link>/post/el6-rootfs-on-tmpfs/</link>
+      <pubDate>Tue, 01 May 2012 21:44:19 &#43;0100</pubDate>
+      <author>Espen Braastad</author>
+      <guid>/post/el6-rootfs-on-tmpfs/</guid>
+      <description>&lt;p&gt;UPDATE: The patch below has been updated &lt;a href=&#34;/post/el6-rootfs-on-tmpfs-update&#34;&gt;here&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;There are several scenarios where conventional hard drives are not really needed. Examples are HPC cluster nodes, virtualization nodes, home theater streaming PCs, silent desktops, internet cafés and embedded systems. Hard drives tend to fail, they are slow, they consume power, they generate heat and noise, and they are quite expensive if you need/want something faster and more reliable than SATA.&lt;/p&gt;
+
+&lt;p&gt;This post will show how to run CentOS 6 directly from tmpfs backed by memory, without using the (standard) 512 MB writable overlay. The procedure should be similar for RHEL and Scientific Linux 6.&lt;/p&gt;
+
+&lt;p&gt;The resulting boot process will be:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Boot a node off a PXE enabled DHCP server.&lt;/li&gt;
+&lt;li&gt;Chainload into &lt;a href=&#34;http://blog.braastad.org/?p=128&#34;&gt;iPXE&lt;/a&gt;.&lt;/li&gt;
+&lt;li&gt;Download vmlinuz and a rather large initrd containing the entire filesystem over ftp/http(s). Try to avoid &lt;a href=&#34;http://en.wikipedia.org/wiki/Trivial_File_Transfer_Protocol&#34;&gt;TFTP&lt;/a&gt; when downloading the initrd because of its file size limitation and slow transfer speeds.&lt;/li&gt;
+&lt;li&gt;Once downloaded, the kernel will start and the initrd will be mounted.&lt;/li&gt;
+&lt;li&gt;The modified dracut scripts in the initrd will create a tmpfs partition in memory with the same size as your filesystem image included in the initrd.&lt;/li&gt;
+&lt;li&gt;Your entire filesystem image will be copied to the tmpfs partition and attached to a loop device.&lt;/li&gt;
+&lt;li&gt;This loop device will be used as the new root device, and the boot process continues as usual.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;This is a screenshot from an ongoing boot process:
+&lt;img src=&#34;/img/centos6-from-tmpfs1.png&#34; alt=&#34;Boot process&#34; /&gt;
+&lt;/p&gt;
+
+&lt;p&gt;Now to the procedure:&lt;/p&gt;
+
+&lt;p&gt;First, create a custom kickstart file. I&amp;rsquo;ve included the specialties below:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;bootloader --location=mbr --append=&amp;quot;toram&amp;quot;
+clearpart --all
+firstboot --disabled
+install
+lang en_US.UTF-8
+network --bootproto dhcp --device eth0 --onboot yes
+part / --fstype=ext4 --size=2048
+reboot
+zerombr
+
+%packages
+patch
+
+%post
+cat &amp;gt; /etc/fstab &amp;lt;&amp;lt; END 
+tmpfs      /         tmpfs   defaults         0 0
+devpts     /dev/pts  devpts  gid=5,mode=620   0 0
+tmpfs      /dev/shm  tmpfs   defaults         0 0
+proc       /proc     proc    defaults         0 0
+sysfs      /sys      sysfs   defaults         0 0
+END
+
+# The patch is base64 encoded to avoid having to escape it manually.
+cat &amp;gt; /root/dmsquash-live-root.base64 &amp;lt;&amp;lt; EOF_patch
+MjFhMjIKPiBnZXRhcmcgdG9yYW0gJiYgdG9yYW09InllcyIKMTM0YzEzNSwxMzgKPCAgICAgZG9f
+bGl2ZV9mcm9tX2Jhc2VfbG9vcAotLS0KPiAgICAgIyBDcmVhdGUgb3ZlcmxheSBvbmx5IGlmIHRv
+cmFtIGlzIG5vdCBzZXQKPiAgICAgaWYgWyAteiAiJHRvcmFtIiBdIDsgdGhlbgo+ICAgICAgICAg
+ZG9fbGl2ZV9mcm9tX2Jhc2VfbG9vcAo+ICAgICBmaQoxNjNjMTY3LDIxMwo8ICAgICBkb19saXZl
+X2Zyb21fYmFzZV9sb29wCi0tLQo+ICAgICAjIENyZWF0ZSBvdmVybGF5IG9ubHkgaWYgdG9yYW0g
+aXMgbm90IHNldAo+ICAgICBpZiBbIC16ICIkdG9yYW0iIF0gOyB0aGVuCj4gICAgICAgICBkb19s
+aXZlX2Zyb21fYmFzZV9sb29wCj4gICAgIGZpCj4gZmkKPiAKPiAjIEkgdGhlIGtlcm5lbCBwYXJh
+bWV0ZXIgdG9yYW0gaXMgc2V0LCBjcmVhdGUgYSB0bXBmcyBkZXZpY2UgYW5kIGNvcHkgdGhlIAo+
+ICMgZmlsZXN5c3RlbSB0byBpdC4gQ29udGludWUgdGhlIGJvb3QgcHJvY2VzcyB3aXRoIHRoaXMg
+dG1wZnMgZGV2aWNlIGFzCj4gIyBhIHdyaXRhYmxlIHJvb3QgZGV2aWNlLgo+IGlmIFsgLW4gIiR0
+b3JhbSIgXSA7IHRoZW4KPiAgICAgYmxvY2tzPSQoIGJsb2NrZGV2IC0tZ2V0c3ogJEJBU0VfTE9P
+UERFViApCj4gCj4gICAgIGVjaG8gIkNyZWF0ZSB0bXBmcyAoJGJsb2NrcyBibG9ja3MpIGZvciB0
+aGUgcm9vdCBmaWxlc3lzdGVtLi4uIgo+ICAgICBta2RpciAtcCAvaW1hZ2UKPiAgICAgbW91bnQg
+LW4gLXQgdG1wZnMgLW8gbnJfYmxvY2tzPSRibG9ja3MgdG1wZnMgL2ltYWdlCj4gCj4gICAgIGVj
+aG8gIkNvcHkgZmlsZXN5c3RlbSBpbWFnZSB0byB0bXBmcy4uLiAodGhpcyBtYXkgdGFrZSBhIGZl
+dyBtaW51dGVzKSIKPiAgICAgZGQgaWY9JEJBU0VfTE9PUERFViBvZj0vaW1hZ2Uvcm9vdGZzLmlt
+Zwo+IAo+ICAgICBST09URlNfTE9PUERFVj0kKCBsb3NldHVwIC1mICkKPiAgICAgZWNobyAiQ3Jl
+YXRlIGxvb3AgZGV2aWNlIGZvciB0aGUgcm9vdCBmaWxlc3lzdGVtOiAkUk9PVEZTX0xPT1BERVYi
+Cj4gICAgIGxvc2V0dXAgJFJPT1RGU19MT09QREVWIC9pbWFnZS9yb290ZnMuaW1nCj4gCj4gICAg
+IGVjaG8gIkl0J3MgdGltZSB0byBjbGVhbiB1cC4uICIKPiAKPiAgICAgZWNobyAiID4gVW1vdW50
+aW5nIGltYWdlcyIKPiAgICAgdW1vdW50IC1sIC9pbWFnZQo+ICAgICB1bW91bnQgLWwgL2Rldi8u
+aW5pdHJhbWZzL2xpdmUKPiAKPiAgICAgZWNobyAiID4gRGV0YWNoICRPU01JTl9MT09QREVWIgo+
+ICAgICBsb3NldHVwIC1kICRPU01JTl9MT09QREVWCj4gCj4gICAgIGVjaG8gIiA+IERldGFjaCAk
+T1NNSU5fU1FVQVNIRURfTE9PUERFViIKPiAgICAgbG9zZXR1cCAtZCAkT1NNSU5fU1FVQVNIRURf
+TE9PUERFVgo+ICAgICAKPiAgICAgZWNobyAiID4gRGV0YWNoICRCQVNFX0xPT1BERVYiCj4gICAg
+IGxvc2V0dXAgLWQgJEJBU0VfTE9PUERFVgo+ICAgICAKPiAgICAgZWNobyAiID4gRGV0YWNoICRT
+UVVBU0hFRF9MT09QREVWIgo+ICAgICBsb3NldHVwIC1kICRTUVVBU0hFRF9MT09QREVWCj4gCj4g
+ICAgIGVjaG8gIlJvb3QgZmlsZXN5c3RlbSBpcyBub3cgb24gJFJPT1RGU19MT09QREVWLiIKPiAg
+ICAgZWNobwo+IAo+ICAgICBsbiAtcyAkUk9PVEZTX0xPT1BERVYgL2Rldi9yb290Cj4gICAgIHBy
+aW50ZiAnL2Jpbi9tb3VudCAtbyBydyAlcyAlc1xuJyAiJFJPT1RGU19MT09QREVWIiAiJE5FV1JP
+T1QiID4gL21vdW50LzAxLSQkLWxpdmUuc2gKPiAgICAgZXhpdCAwCjE2OWMyMTksMjIxCjwgICAg
+IGVjaG8gIjAgJCggYmxvY2tkZXYgLS1nZXRzeiAkQkFTRV9MT09QREVWICkgc25hcHNob3QgJEJB
+U0VfTE9PUERFViAkT1NNSU5fTE9PUERFViBwIDgiIHwgZG1zZXR1cCBjcmVhdGUgLS1yZWFkb25s
+eSBsaXZlLW9zaW1nLW1pbgotLS0KPiAgICAgaWYgWyAteiAiJHRvcmFtIiBdIDsgdGhlbgo+ICAg
+ICAgICAgZWNobyAiMCAkKCBibG9ja2RldiAtLWdldHN6ICRCQVNFX0xPT1BERVYgKSBzbmFwc2hv
+dCAkQkFTRV9MT09QREVWICRPU01JTl9MT09QREVWIHAgOCIgfCBkbXNldHVwIGNyZWF0ZSAtLXJl
+YWRvbmx5IGxpdmUtb3NpbWctbWluCj4gICAgIGZpCg==
+EOF_patch
+
+cat /root/dmsquash-live-root.base64 | base64 -d &amp;gt; /root/dmsquash-live-root.patch
+
+patch /usr/share/dracut/modules.d/90dmsquash-live/dmsquash-live-root /root/dmsquash-live-root.patch
+
+ls /lib/modules | while read kernel; do
+  echo &amp;quot; &amp;gt; Update initramfs for kernel ${kernel}&amp;quot;
+  initrdfile=&amp;quot;/boot/initramfs-${kernel}.img&amp;quot;
+
+  /sbin/dracut -f $initrdfile $kernel
+done
+%end
+
+%post --nochroot
+
+echo &amp;quot;Copy initramfs outside the chroot:&amp;quot;
+ls $INSTALL_ROOT/lib/modules | while read kernel; do
+  src=&amp;quot;$INSTALL_ROOT/boot/initramfs-${kernel}.img&amp;quot;
+  dst=&amp;quot;$LIVE_ROOT/isolinux/initrd0.img&amp;quot;
+  echo &amp;quot; &amp;gt; $src -&amp;gt; $dst&amp;quot;
+  cp -f $src $dst
+done
+%end
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;b&gt;Explaination:&lt;/b&gt; The post script will apply a patch to &lt;i&gt;/usr/share/dracut/modules.d/90dmsquash-live/dmsquash-live-root&lt;/i&gt; before regenerating the initramfs. This patch will add support for the &amp;lsquo;toram&amp;rsquo; boot parameter. Then, the initramfs is being copied to the isolinux directory outside the filesystem image.&lt;/p&gt;
+
+&lt;p&gt;Second, use &lt;i&gt;livecd-creator&lt;/i&gt; and &lt;i&gt;livecd-iso-to-pxeboot&lt;/i&gt; from the &lt;i&gt;livecd-tools&lt;/i&gt; package to convert the kickstart file into a bootable vmlinuz and initrd:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo livecd-creator --config=centos6.ks fslabel=centos6
+$ sudo livecd-iso-to-pxeboot centos6.iso
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;The commands above will create &lt;i&gt;tftpboot/vmlinuz0&lt;/i&gt; and &lt;i&gt;tftpboot/initrd0.img&lt;/i&gt;. Put these files on your boot server and create a suitable PXE configuration. &lt;i&gt;livecd-iso-to-pxeboot&lt;/i&gt; will create &lt;i&gt;tftpboot/pxelinux.cfg/default&lt;/i&gt; which can be used as a template.&lt;/p&gt;
+
+&lt;p&gt;Now you are ready to boot one or multiple CentOS 6 in-memory instances over the network!&lt;/p&gt;
+
+&lt;p&gt;Another screenshot:
+&lt;img src=&#34;/img/centos6-from-tmpfs-details.png&#34; alt=&#34;losetup&#34; /&gt;
+&lt;/p&gt;
+
+&lt;p&gt;Feature request &lt;a href=&#34;http://article.gmane.org/gmane.linux.kernel.initramfs/2588&#34;&gt;upstream&lt;/a&gt;.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>KVM with iPXE in RHEL6</title>
+      <link>/post/kvm-with-ipxe-in-rhel6/</link>
+      <pubDate>Wed, 02 Nov 2011 22:29:50 CET</pubDate>
+      <author>Espen Braastad</author>
+      <guid>/post/kvm-with-ipxe-in-rhel6/</guid>
+      <description>&lt;p&gt;A while ago I discovered the amazing &lt;a href=&#34;http://ipxe.org&#34;&gt;iPXE&lt;/a&gt; project. It is a complete PXE implementation with lots of nifty features, based on the &lt;a href=&#34;http://etherboot.org/&#34;&gt;gPXE&lt;/a&gt; project. Redhat ships the gPXE firmware for qemu and KVM, and you might want to use iPXE instead as the iPXE project currently seems to be more active. The major features (copied from &lt;a href=&#34;http://ipxe.org&#34;&gt;ipxe.org&lt;/a&gt;):&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;boot from a web server via HTTP&lt;/li&gt;
+&lt;li&gt;boot from an iSCSI SAN&lt;/li&gt;
+&lt;li&gt;boot from a Fibre Channel SAN via FCoE&lt;/li&gt;
+&lt;li&gt;boot from an AoE SAN&lt;/li&gt;
+&lt;li&gt;boot from a wireless network&lt;/li&gt;
+&lt;li&gt;boot from a wide-area network&lt;/li&gt;
+&lt;li&gt;boot from an Infiniband network&lt;/li&gt;
+&lt;li&gt;control the boot process with a script&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;First, download the source code:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;espen@luft:~$ mkdir ~/git
+espen@luft:~$ cd ~/git
+espen@luft:~/git$ git clone git://git.ipxe.org/ipxe.git
+Cloning into ipxe...
+remote: Counting objects: 33376, done.
+remote: Compressing objects: 100% (9193/9193), done.
+remote: Total 33376 (delta 24642), reused 30782 (delta 22666)
+Receiving objects: 100% (33376/33376), 8.02 MiB | 1.94 MiB/s, done.
+Resolving deltas: 100% (24642/24642), done.
+espen@luft:~/git$ cd ipxe/
+espen@luft:~/git/ipxe$
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Then change the general configuration file (&lt;em&gt;src/config/general.h&lt;/em&gt;) to suit your needs. Use the &lt;strong&gt;#define&lt;/strong&gt; and &lt;strong&gt;#undef&lt;/strong&gt; to activate and deactivate various features such as VLAN support, DHCP support, etc. Below is a small part of &lt;a href=&#34;https://github.com/ipxe/ipxe/blob/master/src/config/general.h&#34;&gt;the header file&lt;/a&gt; for you to see.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;[...]
+#define IWMGMT_CMD   /* Wireless interface management commands */
+#define FCMGMT_CMD   /* Fibre Channel management commands */
+#define ROUTE_CMD    /* Routing table management commands */
+#define IMAGE_CMD    /* Image management commands */
+#define DHCP_CMD     /* DHCP management commands */
+#define SANBOOT_CMD  /* SAN boot commands */
+#define LOGIN_CMD    /* Login command */
+#undef  TIME_CMD     /* Time commands */
+#undef  DIGEST_CMD   /* Image crypto digest commands */
+#undef  LOTEST_CMD   /* Loopback testing commands */
+#undef  VLAN_CMD     /* VLAN commands */
+#undef  PXE_CMD      /* PXE commands */
+#undef  REBOOT_CMD   /* Reboot command */
+[...]
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Now it&amp;rsquo;s time compile the firmware.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;espen@luft:~/git/ipxe$ cd src/
+espen@luft:~/git/ipxe/src$ make bin/virtio-net.rom
+  [DEPS] arch/i386/drivers/net/undirom.c
+  [DEPS] arch/i386/drivers/net/undipreload.c
+  [DEPS] arch/i386/drivers/net/undionly.c
+  [DEPS] arch/i386/drivers/net/undinet.c
+[...]
+  [BIN] bin/virtio-net.rom.bin
+  [ZINFO] bin/virtio-net.rom.zinfo
+  [ZBIN] bin/virtio-net.rom.zbin
+  [FINISH] bin/virtio-net.rom
+[...]
+espen@luft:~/git/ipxe/src$
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;The firmware compiled successfully, and it is ready to use. Log onto the RHEL 6 node, and verify that you have installed the package &lt;strong&gt;gpxe-roms-qemu&lt;/strong&gt; (&lt;strong&gt;qemu-kvm&lt;/strong&gt; currently depends on &lt;strong&gt;gpxe-roms-qemu&lt;/strong&gt;). The directory &lt;em&gt;/usr/share/gpxe/&lt;/em&gt; contains the gPXE boot roms from this package.&lt;/p&gt;
+
+&lt;p&gt;To use your custom iPXE boot firmware instead, you can build a new rpm package that contains the new rom - or you can simply replace &lt;em&gt;/usr/share/gpxe/virtio-net.rom&lt;/em&gt; [gPXE] with your &lt;em&gt;~/git/ipxe/src/bin/virtio-net.rom&lt;/em&gt; [iPXE]. As least you will have iPXE boot firmware until the &lt;strong&gt;qemu-roms-qemu&lt;/strong&gt; package is updated ;)&lt;/p&gt;
+
+&lt;p&gt;Make sure that your virtual machines are using the &lt;strong&gt;&lt;a href=&#34;http://wiki.libvirt.org/page/Virtio&#34;&gt;virtio&lt;/a&gt;&lt;/strong&gt; network device driver, and you are all set:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;[...]
+&amp;lt;interface type=&#39;bridge&#39;&amp;gt;
+  [...]
+  &amp;lt;model type=&#39;virtio&#39;/&amp;gt;
+&amp;lt;/interface&amp;gt;
+[...]
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Your virtual machines will now be booted using the iPXE boot firmware. Have a look at the &lt;a href=&#34;http://ipxe.org/scripting&#34;&gt;iPXE scripting documentation&lt;/a&gt; for more inspiration!&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>munincollector-ng</title>
+      <link>/post/munincollector-ng/</link>
+      <pubDate>Mon, 16 Aug 2010 20:15:00 &#43;0100</pubDate>
+      <author>Espen Braastad</author>
+      <guid>/post/munincollector-ng/</guid>
+      <description>&lt;p&gt;Munincollector-ng is a perl script that collects graphs from multiple &lt;a href=&#34;http://munin-monitoring.org&#34;&gt;munin&lt;/a&gt; installations to display them in one page. A scenario where this is helpful is when you have (too) many munin clients on (too) many munin masters, and you want to look through some of the graphs - i.e. the &lt;em&gt;Disk usage in percent&lt;/em&gt; (aka &lt;em&gt;df&lt;/em&gt;) plugin - without spending/wasting too much time browsing through the less important graphs.&lt;/p&gt;
+
+&lt;p&gt;It consists of one perl script and one configuration file. It is being executed regularly by cron. At each run, it iterates through the configuration file; downloads the graphs to a local directory and generates an html file.&lt;/p&gt;
+
+&lt;p&gt;Below is some example configuration that will gather the &lt;em&gt;week&lt;/em&gt; and &lt;em&gt;month&lt;/em&gt; graphs from the &lt;em&gt;df&lt;/em&gt; plugin from four separate munin masters (three without authentication and one with authentication). The graphs will be downloaded to &lt;em&gt;/var/www/munincollector-ng/&lt;/em&gt;:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;# General configuration
+graph.plugin df
+graph.type week month
+graph.log /var/log/munincollector-ng.log
+graph.dir /var/www/munincollector-ng
+
+# Configuration per munin master you want to collect graphs from.
+# The format is: &amp;lt;id&amp;gt;.&amp;lt;option&amp;gt; &amp;lt;value&amp;gt;
+
+# Three munin installations with no authentication
+uio.url http://munin.ping.uio.no
+foo.url http://foo.com/munin/
+bar.url http://bar.com/munin/
+
+# One munin master that requires authentication
+baz.url http://baz.com/munin/
+baz.realm Munin
+baz.username user1
+baz.password pass1
+baz.netloc baz.com:80
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;An example cron job that will execute the script once per day (make sure &lt;em&gt;user&lt;/em&gt; have write permissions in &lt;em&gt;/var/www/munincollector-ng/&lt;/em&gt;):&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;8 8 * * * user /usr/local/bin/munincollector-ng -c /etc/munincollector-ng/example.conf
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;The script is available from &lt;a href=&#34;https://github.com/espebra/munincollector-ng&#34;&gt;Github&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;PS: Put the &lt;em&gt;logo.png&lt;/em&gt; and &lt;em&gt;style.css&lt;/em&gt; from your &lt;em&gt;/etc/munin/templates/&lt;/em&gt; directory into &lt;em&gt;/var/www/munincollector-ng/&lt;/em&gt; to make it look a bit nicer.&lt;/p&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>

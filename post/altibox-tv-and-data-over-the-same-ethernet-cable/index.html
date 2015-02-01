@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
+<head>
+  <link href="http://gmpg.org/xfn/11" rel="profile">
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+
+  <title> Altibox, TV- og datatrafikk over samme nettverkskabel &middot; Espen Braastad </title>
+
+  
+  <link rel="stylesheet" href="/css/poole.css">
+  <link rel="stylesheet" href="/css/syntax.css">
+  <link rel="stylesheet" href="/css/hyde.css">
+  <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=PT+Sans:400,400italic,700|Abril+Fatface">
+
+  
+  <link rel="stylesheet" href="/highlightjs/default.min.css">
+  <script src="/highlightjs/highlight.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script>
+
+  
+  <link rel="apple-touch-icon-precomposed" sizes="144x144" href="/apple-touch-icon-144-precomposed.png">
+  <link rel="shortcut icon" href="/favicon.ico">
+
+  
+  <link href="" rel="alternate" type="application/rss+xml" title="Espen Braastad" />
+
+  <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  
+    ga('create', 'UA-59220530-1', 'auto');
+    ga('send', 'pageview');
+  
+  </script>
+</head>
+
+  <body>
+
+    <div class="sidebar">
+  <div class="container sidebar-sticky">
+    <div class="sidebar-about">
+      <h1>Espen Braastad</h1>
+    </div>
+
+    <ul class="sidebar-nav">
+      <li><a href="/">Home</a> </li>
+      
+        <li><a href="/post">Posts</a></li>
+    </ul>
+  </div>
+</div>
+
+
+    <div class="content container">
+      <div class="post">
+        <h1>Altibox, TV- og datatrafikk over samme nettverkskabel</h1>
+        <span class="post-date">Thu, May 22, 2014</span>
+        <p>Altibox leverer en hjemmesentral hvor man henter ut TV-signal og internettilgang fra to (eller flere) forskjellige RJ45-porter. Som trådløs router har hjemmesentralen kun et minimum av funksjonalitet, og man skal ikke være en veldig avansert bruker før man vil rekonfigurere hjemmesentralen som en bridge og heller ha en egen trådløs router på baksiden. Dette gir også mening dersom boligen har flere etasjer, og hjemmesentralen ikke er kraftig nok til å levere god nok trådløs dekning.</p>
+
+<p>Denne posten viser hvordan TV og datatrafikk kan sendes via èn nettverkskabel til et annet sted i boligen ved hjelp av to stk Mikrotik 951G-2HnD. RB951G-2HnD er en fleksibel trådløs router (2,4 GHz) med 5 stk 1 Gbps-porter beregnet på hjemmebruk. Utstyret kobles som skjemaet under viser.</p>
+
+<p><img src="/img/mikrotik-altibox.png" alt="Diagram" />
+</p>
+
+<p>Mikrotik A, konfigurasjon:</p>
+
+<pre><code>/interface vlan add name=vlan-10 vlan-id=10 interface=ether2 disabled=no
+/interface bridge add name=br-vlan10 disabled=no
+/interface bridge port add interface=&quot;vlan-10&quot; bridge=&quot;br-vlan10&quot; disabled=no
+/interface ethernet set numbers=ether5-slave-local master-port=none
+/interface bridge port add interface=&quot;ether5-slave-local&quot; bridge=&quot;br-vlan10&quot; disabled=no
+</code></pre>
+
+<p>Mikrotik A, portoversikt:</p>
+
+<pre><code>Port 1: Internett inn (datakabel fra Altibox hjemmesentral)
+Port 2: Trunk til Mikrotik B
+Port 3: Data
+Port 4: Data
+Port 5: TV inn (TV-kabel fra Altibox hjemmesentral)
+</code></pre>
+
+<p>Mikrotik B, konfigurasjon:</p>
+
+<pre><code>/interface vlan add name=vlan-10 vlan-id=10 interface=ether2 disabled=no
+/interface bridge add name=br-vlan10 disabled=no
+/interface bridge port add interface=&quot;vlan-10&quot; bridge=&quot;br-vlan10&quot; disabled=no
+/interface ethernet set numbers=ether4-slave-local master-port=none
+/interface ethernet set numbers=ether5-slave-local master-port=none
+/interface bridge port add interface=&quot;ether4-slave-local&quot; bridge=&quot;br-vlan10&quot; disabled=no
+/interface bridge port add interface=&quot;ether5-slave-local&quot; bridge=&quot;br-vlan10&quot; disabled=no
+</code></pre>
+
+<p>I tillegg må Mikrotik B settes opp som en bridge.</p>
+
+<p>Mikrotik B, portoversikt:</p>
+
+<pre><code>Port 1: Data
+Port 2: Trunk til Mikrotik A
+Port 3: Data
+Port 4: TV ut
+Port 5: TV ut
+</code></pre>
+
+        <div id="disqus_thread"></div>
+<script type="text/javascript">
+
+(function() {
+    
+    
+    if (window.location.hostname == "localhost") 
+        return;
+
+    var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+    var disqus_shortname = 'espebra';
+    var disqus_identifier = 'Altibox, TV- og datatrafikk over samme nettverkskabel';
+
+    dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+})();
+</script>
+<noscript>Please enable JavaScript to view the comments powered by <a href="http://disqus.com/?ref_noscript">Disqus.</a></noscript>
+
+      </div>
+    </div>
+  </body>
+</html>

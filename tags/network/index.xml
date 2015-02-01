@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Network on Espen Braastad</title>
+    <link>/tags/network/</link>
+    <description>Recent content in Network on Espen Braastad</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <author>Espen Braastad</author>
+    
+    <lastBuildDate>Sat, 30 Aug 2014 20:48:00 &#43;0100</lastBuildDate>
+    <atom:link href="/tags/network/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Remote console on HP ProLiant MicroServer G7 N54L</title>
+      <link>/post/remote-console-on-hp-proliant-microserver-g7-n54l/</link>
+      <pubDate>Sat, 30 Aug 2014 20:48:00 &#43;0100</pubDate>
+      <author>Espen Braastad</author>
+      <guid>/post/remote-console-on-hp-proliant-microserver-g7-n54l/</guid>
+      <description>&lt;p&gt;I bought the &lt;a href=&#34;http://www8.hp.com/us/en/products/proliant-servers/product-detail.html?oid=6280786&#34;&gt;HP ProLiant MicroServer G7 N54L&lt;/a&gt; a while ago. I threw in a &lt;a href=&#34;http://www8.hp.com/us/en/products/oas/product-detail.html?oid=4275612&#34;&gt;HP MicroServer Remote Access Card Kit&lt;/a&gt; to get remote console and power management. While the power management, web UI and CLI (over ssh) works fine out of the box, the remote console (KVM) does not. What happens is that the KVM client shows the following &lt;code&gt;Out of range&lt;/code&gt; message:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;/img/outofrange.png&#34; alt=&#34;Out of range&#34; /&gt;
+&lt;/p&gt;
+
+&lt;p&gt;To fix this, go into the BIOS. Navigate to Advanced, PCI Express Configuration and Embedded VGA Control like this:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;/img/bios1.png&#34; alt=&#34;BIOS 1&#34; /&gt;
+
+&lt;img src=&#34;/img/bios2.png&#34; alt=&#34;BIOS 2&#34; /&gt;
+&lt;/p&gt;
+
+&lt;p&gt;Flip from &amp;ldquo;Always enabled&amp;rdquo; (default) to &amp;ldquo;Auto Detect&amp;rdquo;. Save and quit. Then, make sure that your monitor is connected to the VGA port on the RAC instead of the embedded VGA port.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Altibox, TV- og datatrafikk over samme nettverkskabel</title>
+      <link>/post/altibox-tv-and-data-over-the-same-ethernet-cable/</link>
+      <pubDate>Thu, 22 May 2014 22:41:00 &#43;0100</pubDate>
+      <author>Espen Braastad</author>
+      <guid>/post/altibox-tv-and-data-over-the-same-ethernet-cable/</guid>
+      <description>&lt;p&gt;Altibox leverer en hjemmesentral hvor man henter ut TV-signal og internettilgang fra to (eller flere) forskjellige RJ45-porter. Som trådløs router har hjemmesentralen kun et minimum av funksjonalitet, og man skal ikke være en veldig avansert bruker før man vil rekonfigurere hjemmesentralen som en bridge og heller ha en egen trådløs router på baksiden. Dette gir også mening dersom boligen har flere etasjer, og hjemmesentralen ikke er kraftig nok til å levere god nok trådløs dekning.&lt;/p&gt;
+
+&lt;p&gt;Denne posten viser hvordan TV og datatrafikk kan sendes via èn nettverkskabel til et annet sted i boligen ved hjelp av to stk Mikrotik 951G-2HnD. RB951G-2HnD er en fleksibel trådløs router (2,4 GHz) med 5 stk 1 Gbps-porter beregnet på hjemmebruk. Utstyret kobles som skjemaet under viser.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;/img/mikrotik-altibox.png&#34; alt=&#34;Diagram&#34; /&gt;
+&lt;/p&gt;
+
+&lt;p&gt;Mikrotik A, konfigurasjon:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;/interface vlan add name=vlan-10 vlan-id=10 interface=ether2 disabled=no
+/interface bridge add name=br-vlan10 disabled=no
+/interface bridge port add interface=&amp;quot;vlan-10&amp;quot; bridge=&amp;quot;br-vlan10&amp;quot; disabled=no
+/interface ethernet set numbers=ether5-slave-local master-port=none
+/interface bridge port add interface=&amp;quot;ether5-slave-local&amp;quot; bridge=&amp;quot;br-vlan10&amp;quot; disabled=no
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Mikrotik A, portoversikt:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;Port 1: Internett inn (datakabel fra Altibox hjemmesentral)
+Port 2: Trunk til Mikrotik B
+Port 3: Data
+Port 4: Data
+Port 5: TV inn (TV-kabel fra Altibox hjemmesentral)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Mikrotik B, konfigurasjon:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;/interface vlan add name=vlan-10 vlan-id=10 interface=ether2 disabled=no
+/interface bridge add name=br-vlan10 disabled=no
+/interface bridge port add interface=&amp;quot;vlan-10&amp;quot; bridge=&amp;quot;br-vlan10&amp;quot; disabled=no
+/interface ethernet set numbers=ether4-slave-local master-port=none
+/interface ethernet set numbers=ether5-slave-local master-port=none
+/interface bridge port add interface=&amp;quot;ether4-slave-local&amp;quot; bridge=&amp;quot;br-vlan10&amp;quot; disabled=no
+/interface bridge port add interface=&amp;quot;ether5-slave-local&amp;quot; bridge=&amp;quot;br-vlan10&amp;quot; disabled=no
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;I tillegg må Mikrotik B settes opp som en bridge.&lt;/p&gt;
+
+&lt;p&gt;Mikrotik B, portoversikt:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;Port 1: Data
+Port 2: Trunk til Mikrotik A
+Port 3: Data
+Port 4: TV ut
+Port 5: TV ut
+&lt;/code&gt;&lt;/pre&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>
