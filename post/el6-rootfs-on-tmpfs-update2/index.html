@@ -10,19 +10,19 @@
   <title> CentOS/RHEL/SL 6: root filesystem on tmpfs, UPDATE #2 &middot; Espen Braastad </title>
 
   
-  <link rel="stylesheet" href="/css/poole.css">
-  <link rel="stylesheet" href="/css/syntax.css">
-  <link rel="stylesheet" href="/css/hyde.css">
+  <link rel="stylesheet" href="http://espebra.github.io/website/css/poole.css">
+  <link rel="stylesheet" href="http://espebra.github.io/website/css/syntax.css">
+  <link rel="stylesheet" href="http://espebra.github.io/website/css/hyde.css">
   <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=PT+Sans:400,400italic,700|Abril+Fatface">
 
   
-  <link rel="stylesheet" href="/highlightjs/default.min.css">
-  <script src="/highlightjs/highlight.min.js"></script>
+  <link rel="stylesheet" href="http://espebra.github.io/website/highlightjs/default.min.css">
+  <script src="http://espebra.github.io/website/highlightjs/highlight.min.js"></script>
   <script>hljs.initHighlightingOnLoad();</script>
 
   
-  <link rel="apple-touch-icon-precomposed" sizes="144x144" href="/apple-touch-icon-144-precomposed.png">
-  <link rel="shortcut icon" href="/favicon.ico">
+  <link rel="apple-touch-icon-precomposed" sizes="144x144" href="http://espebra.github.io/website/apple-touch-icon-144-precomposed.png">
+  <link rel="shortcut icon" href="http://espebra.github.io/website/favicon.ico">
 
   
   <link href="" rel="alternate" type="application/rss+xml" title="Espen Braastad" />
@@ -48,9 +48,9 @@
     </div>
 
     <ul class="sidebar-nav">
-      <li><a href="/">Home</a> </li>
+      <li><a href="http://espebra.github.io/website/">Home</a> </li>
       
-        <li><a href="/post">Posts</a></li>
+        <li><a href="http://espebra.github.io/website/post">Posts</a></li>
     </ul>
   </div>
 </div>
@@ -62,7 +62,7 @@
         <span class="post-date">Sun, Jun 23, 2013</span>
         
 
-<p>In a <a href="/post/el6-rootfs-on-tmpfs">previous post</a>, I’ve explained how to boot EL6 from memory without having / needing a physical disk.</p>
+<p>In a <a href="http://espebra.github.io/website/post/el6-rootfs-on-tmpfs">previous post</a>, I’ve explained how to boot EL6 from memory without having / needing a physical disk.</p>
 
 <p>A bright reader, Jeff, came up with an alternative method. This alternative method does not involve dd’ing the image into a loop device, but instead copying the contents of the disk image directly into tmpfs. The result is higher write/read performance and generally lower memory requirements. The latter because unused disk space does not consume memory, which is important to consider when choosing the method to use in production systems.</p>
 

@@ -10,19 +10,19 @@
   <title> Remote console on HP ProLiant MicroServer G7 N54L &middot; Espen Braastad </title>
 
   
-  <link rel="stylesheet" href="/css/poole.css">
-  <link rel="stylesheet" href="/css/syntax.css">
-  <link rel="stylesheet" href="/css/hyde.css">
+  <link rel="stylesheet" href="http://espebra.github.io/website/css/poole.css">
+  <link rel="stylesheet" href="http://espebra.github.io/website/css/syntax.css">
+  <link rel="stylesheet" href="http://espebra.github.io/website/css/hyde.css">
   <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=PT+Sans:400,400italic,700|Abril+Fatface">
 
   
-  <link rel="stylesheet" href="/highlightjs/default.min.css">
-  <script src="/highlightjs/highlight.min.js"></script>
+  <link rel="stylesheet" href="http://espebra.github.io/website/highlightjs/default.min.css">
+  <script src="http://espebra.github.io/website/highlightjs/highlight.min.js"></script>
   <script>hljs.initHighlightingOnLoad();</script>
 
   
-  <link rel="apple-touch-icon-precomposed" sizes="144x144" href="/apple-touch-icon-144-precomposed.png">
-  <link rel="shortcut icon" href="/favicon.ico">
+  <link rel="apple-touch-icon-precomposed" sizes="144x144" href="http://espebra.github.io/website/apple-touch-icon-144-precomposed.png">
+  <link rel="shortcut icon" href="http://espebra.github.io/website/favicon.ico">
 
   
   <link href="" rel="alternate" type="application/rss+xml" title="Espen Braastad" />
@@ -48,9 +48,9 @@
     </div>
 
     <ul class="sidebar-nav">
-      <li><a href="/">Home</a> </li>
+      <li><a href="http://espebra.github.io/website/">Home</a> </li>
       
-        <li><a href="/post">Posts</a></li>
+        <li><a href="http://espebra.github.io/website/post">Posts</a></li>
     </ul>
   </div>
 </div>
@@ -62,14 +62,14 @@
         <span class="post-date">Sat, Aug 30, 2014</span>
         <p>I bought the <a href="http://www8.hp.com/us/en/products/proliant-servers/product-detail.html?oid=6280786">HP ProLiant MicroServer G7 N54L</a> a while ago. I threw in a <a href="http://www8.hp.com/us/en/products/oas/product-detail.html?oid=4275612">HP MicroServer Remote Access Card Kit</a> to get remote console and power management. While the power management, web UI and CLI (over ssh) works fine out of the box, the remote console (KVM) does not. What happens is that the KVM client shows the following <code>Out of range</code> message:</p>
 
-<p><img src="/img/outofrange.png" alt="Out of range" />
+<p><img src="http://espebra.github.io/website/img/outofrange.png" alt="Out of range" />
 </p>
 
 <p>To fix this, go into the BIOS. Navigate to Advanced, PCI Express Configuration and Embedded VGA Control like this:</p>
 
-<p><img src="/img/bios1.png" alt="BIOS 1" />
+<p><img src="http://espebra.github.io/website/img/bios1.png" alt="BIOS 1" />
 
-<img src="/img/bios2.png" alt="BIOS 2" />
+<img src="http://espebra.github.io/website/img/bios2.png" alt="BIOS 2" />
 </p>
 
 <p>Flip from &ldquo;Always enabled&rdquo; (default) to &ldquo;Auto Detect&rdquo;. Save and quit. Then, make sure that your monitor is connected to the VGA port on the RAC instead of the embedded VGA port.</p>

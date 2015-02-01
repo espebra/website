@@ -2,31 +2,31 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Espen Braastad</title>
-    <link>/</link>
+    <link>http://espebra.github.io/website/</link>
     <description>Recent content on Espen Braastad</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <author>Espen Braastad</author>
     
     <lastBuildDate>Sat, 30 Aug 2014 20:48:00 &#43;0100</lastBuildDate>
-    <atom:link href="/index.xml" rel="self" type="application/rss+xml" />
+    <atom:link href="http://espebra.github.io/website/index.xml" rel="self" type="application/rss+xml" />
     
     <item>
       <title>Remote console on HP ProLiant MicroServer G7 N54L</title>
-      <link>/post/remote-console-on-hp-proliant-microserver-g7-n54l/</link>
+      <link>http://espebra.github.io/website/post/remote-console-on-hp-proliant-microserver-g7-n54l/</link>
       <pubDate>Sat, 30 Aug 2014 20:48:00 &#43;0100</pubDate>
       <author>Espen Braastad</author>
-      <guid>/post/remote-console-on-hp-proliant-microserver-g7-n54l/</guid>
+      <guid>http://espebra.github.io/website/post/remote-console-on-hp-proliant-microserver-g7-n54l/</guid>
       <description>&lt;p&gt;I bought the &lt;a href=&#34;http://www8.hp.com/us/en/products/proliant-servers/product-detail.html?oid=6280786&#34;&gt;HP ProLiant MicroServer G7 N54L&lt;/a&gt; a while ago. I threw in a &lt;a href=&#34;http://www8.hp.com/us/en/products/oas/product-detail.html?oid=4275612&#34;&gt;HP MicroServer Remote Access Card Kit&lt;/a&gt; to get remote console and power management. While the power management, web UI and CLI (over ssh) works fine out of the box, the remote console (KVM) does not. What happens is that the KVM client shows the following &lt;code&gt;Out of range&lt;/code&gt; message:&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&#34;/img/outofrange.png&#34; alt=&#34;Out of range&#34; /&gt;
+&lt;p&gt;&lt;img src=&#34;http://espebra.github.io/website/img/outofrange.png&#34; alt=&#34;Out of range&#34; /&gt;
 &lt;/p&gt;
 
 &lt;p&gt;To fix this, go into the BIOS. Navigate to Advanced, PCI Express Configuration and Embedded VGA Control like this:&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&#34;/img/bios1.png&#34; alt=&#34;BIOS 1&#34; /&gt;
+&lt;p&gt;&lt;img src=&#34;http://espebra.github.io/website/img/bios1.png&#34; alt=&#34;BIOS 1&#34; /&gt;
 
-&lt;img src=&#34;/img/bios2.png&#34; alt=&#34;BIOS 2&#34; /&gt;
+&lt;img src=&#34;http://espebra.github.io/website/img/bios2.png&#34; alt=&#34;BIOS 2&#34; /&gt;
 &lt;/p&gt;
 
 &lt;p&gt;Flip from &amp;ldquo;Always enabled&amp;rdquo; (default) to &amp;ldquo;Auto Detect&amp;rdquo;. Save and quit. Then, make sure that your monitor is connected to the VGA port on the RAC instead of the embedded VGA port.&lt;/p&gt;
@@ -35,15 +35,15 @@
     
     <item>
       <title>Altibox, TV- og datatrafikk over samme nettverkskabel</title>
-      <link>/post/altibox-tv-and-data-over-the-same-ethernet-cable/</link>
+      <link>http://espebra.github.io/website/post/altibox-tv-and-data-over-the-same-ethernet-cable/</link>
       <pubDate>Thu, 22 May 2014 22:41:00 &#43;0100</pubDate>
       <author>Espen Braastad</author>
-      <guid>/post/altibox-tv-and-data-over-the-same-ethernet-cable/</guid>
+      <guid>http://espebra.github.io/website/post/altibox-tv-and-data-over-the-same-ethernet-cable/</guid>
       <description>&lt;p&gt;Altibox leverer en hjemmesentral hvor man henter ut TV-signal og internettilgang fra to (eller flere) forskjellige RJ45-porter. Som trådløs router har hjemmesentralen kun et minimum av funksjonalitet, og man skal ikke være en veldig avansert bruker før man vil rekonfigurere hjemmesentralen som en bridge og heller ha en egen trådløs router på baksiden. Dette gir også mening dersom boligen har flere etasjer, og hjemmesentralen ikke er kraftig nok til å levere god nok trådløs dekning.&lt;/p&gt;
 
 &lt;p&gt;Denne posten viser hvordan TV og datatrafikk kan sendes via èn nettverkskabel til et annet sted i boligen ved hjelp av to stk Mikrotik 951G-2HnD. RB951G-2HnD er en fleksibel trådløs router (2,4 GHz) med 5 stk 1 Gbps-porter beregnet på hjemmebruk. Utstyret kobles som skjemaet under viser.&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&#34;/img/mikrotik-altibox.png&#34; alt=&#34;Diagram&#34; /&gt;
+&lt;p&gt;&lt;img src=&#34;http://espebra.github.io/website/img/mikrotik-altibox.png&#34; alt=&#34;Diagram&#34; /&gt;
 &lt;/p&gt;
 
 &lt;p&gt;Mikrotik A, konfigurasjon:&lt;/p&gt;
@@ -90,10 +90,10 @@ Port 5: TV ut
     
     <item>
       <title>Temperature trend monitoring at home</title>
-      <link>/post/temperature-trend-monitoring-at-home/</link>
+      <link>http://espebra.github.io/website/post/temperature-trend-monitoring-at-home/</link>
       <pubDate>Wed, 19 Feb 2014 23:32:00 CET</pubDate>
       <author>Espen Braastad</author>
-      <guid>/post/temperature-trend-monitoring-at-home/</guid>
+      <guid>http://espebra.github.io/website/post/temperature-trend-monitoring-at-home/</guid>
       <description>
 
 &lt;h2 id=&#34;background:88f8b93192da3e559035b25b4d4944bf&#34;&gt;Background&lt;/h2&gt;
@@ -106,7 +106,7 @@ Port 5: TV ut
 
 &lt;p&gt;Some temperature sensors are required. Price is an important factor, but so is accuracy. I settled with some sensors from the &lt;a href=&#34;http://www.raphnet.net/electronique/usbtenki/index_en.php&#34;&gt;USBTenki&lt;/a&gt; project. Schematics and software are open source, so you can assemble the sensors yourself if you want to. I didn’t want to, so I bought them ready to run from &lt;a href=&#34;http://www.dracal.com/store/products/usbtenki/index.php&#34;&gt;Dracal&lt;/a&gt;.&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&#34;/img/usbtenki_sensor_on_table.png&#34; alt=&#34;Sensor&#34; /&gt;
+&lt;p&gt;&lt;img src=&#34;http://espebra.github.io/website/img/usbtenki_sensor_on_table.png&#34; alt=&#34;Sensor&#34; /&gt;
 &lt;/p&gt;
 
 &lt;ul&gt;
@@ -139,16 +139,16 @@ sudo apt-get install munin munin-node
 
 &lt;p&gt;A couple of the sensors are mounted in the ventilation tubes for permanent monitoring, and the other ones are used for temporary monitoring at various locations.&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&#34;/img/usbtenki_sensor_mounted.png&#34; alt=&#34;Sensor&#34; /&gt;
+&lt;p&gt;&lt;img src=&#34;http://espebra.github.io/website/img/usbtenki_sensor_mounted.png&#34; alt=&#34;Sensor&#34; /&gt;
 &lt;/p&gt;
 
 &lt;p&gt;Since the number of sensors and the locations will vary, I need a munin plugin that is flexible. I wrote a simple multigraph plugin that will detect new sensors and create a new graph per sensor that is added. These graphs are completely standardised and (frankly) pretty boring:&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&#34;/img/sensor_905270-week.png&#34; alt=&#34;Sensor&#34; /&gt;
+&lt;p&gt;&lt;img src=&#34;http://espebra.github.io/website/img/sensor_905270-week.png&#34; alt=&#34;Sensor&#34; /&gt;
 
-&lt;img src=&#34;/img/sensor_E10084-week.png&#34; alt=&#34;Sensor&#34; /&gt;
+&lt;img src=&#34;http://espebra.github.io/website/img/sensor_E10084-week.png&#34; alt=&#34;Sensor&#34; /&gt;
 
-&lt;img src=&#34;/img/sensor_E10087-week.png&#34; alt=&#34;Sensor&#34; /&gt;
+&lt;img src=&#34;http://espebra.github.io/website/img/sensor_E10087-week.png&#34; alt=&#34;Sensor&#34; /&gt;
 &lt;/p&gt;
 
 &lt;p&gt;Data loaning is used to aggregate the different sensor data and to modify their presentation (type, colour, label, etc) as I see fit, without having to modify the plugin itself. This will ensure that old sensor data is kept whenever modifications are made, and the data from each sensor can be used in multiple aggregated graphs if needed.&lt;/p&gt;
@@ -179,10 +179,10 @@ sudo apt-get install munin munin-node
     temp.E10090.label Air intake (inside)
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;&lt;img src=&#34;/img/temp-week.png&#34; alt=&#34;Aggregated, by week&#34; /&gt;
+&lt;p&gt;&lt;img src=&#34;http://espebra.github.io/website/img/temp-week.png&#34; alt=&#34;Aggregated, by week&#34; /&gt;
 &lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&#34;/img/temp-day.png&#34; alt=&#34;Aggregated, by day&#34; /&gt;
+&lt;p&gt;&lt;img src=&#34;http://espebra.github.io/website/img/temp-day.png&#34; alt=&#34;Aggregated, by day&#34; /&gt;
 &lt;/p&gt;
 
 &lt;p&gt;Air flow, carbon dioxide, humidity and power consumption are other aspects that are interesting to monitor as well, but those will have to wait until I find reasonably priced sensors with satisfying accuracy and quality.&lt;/p&gt;
@@ -191,13 +191,13 @@ sudo apt-get install munin munin-node
     
     <item>
       <title>CentOS/RHEL/SL 6: root filesystem on tmpfs, UPDATE #2</title>
-      <link>/post/el6-rootfs-on-tmpfs-update2/</link>
+      <link>http://espebra.github.io/website/post/el6-rootfs-on-tmpfs-update2/</link>
       <pubDate>Sun, 23 Jun 2013 21:44:19 &#43;0100</pubDate>
       <author>Espen Braastad</author>
-      <guid>/post/el6-rootfs-on-tmpfs-update2/</guid>
+      <guid>http://espebra.github.io/website/post/el6-rootfs-on-tmpfs-update2/</guid>
       <description>
 
-&lt;p&gt;In a &lt;a href=&#34;/post/el6-rootfs-on-tmpfs&#34;&gt;previous post&lt;/a&gt;, I’ve explained how to boot EL6 from memory without having / needing a physical disk.&lt;/p&gt;
+&lt;p&gt;In a &lt;a href=&#34;http://espebra.github.io/website/post/el6-rootfs-on-tmpfs&#34;&gt;previous post&lt;/a&gt;, I’ve explained how to boot EL6 from memory without having / needing a physical disk.&lt;/p&gt;
 
 &lt;p&gt;A bright reader, Jeff, came up with an alternative method. This alternative method does not involve dd’ing the image into a loop device, but instead copying the contents of the disk image directly into tmpfs. The result is higher write/read performance and generally lower memory requirements. The latter because unused disk space does not consume memory, which is important to consider when choosing the method to use in production systems.&lt;/p&gt;
 
@@ -299,11 +299,11 @@ sys 0m0.002s
     
     <item>
       <title>CentOS/RHEL/SL 6: root filesystem on tmpfs, UPDATE</title>
-      <link>/post/el6-rootfs-on-tmpfs-update/</link>
+      <link>http://espebra.github.io/website/post/el6-rootfs-on-tmpfs-update/</link>
       <pubDate>Thu, 21 Mar 2013 09:57:00 CET</pubDate>
       <author>Espen Braastad</author>
-      <guid>/post/el6-rootfs-on-tmpfs-update/</guid>
-      <description>&lt;p&gt;In EL6.4, the file &lt;code&gt;/usr/share/dracut/modules.d/90dmsquash-live/dmsquash-live-root&lt;/code&gt; was updated so that the &lt;a href=&#34;/post/el6-rootfs-on-tmpfs&#34;&gt;previous patch&lt;/a&gt; no longer works as it should. I’ve updated the patch, and here it is:&lt;/p&gt;
+      <guid>http://espebra.github.io/website/post/el6-rootfs-on-tmpfs-update/</guid>
+      <description>&lt;p&gt;In EL6.4, the file &lt;code&gt;/usr/share/dracut/modules.d/90dmsquash-live/dmsquash-live-root&lt;/code&gt; was updated so that the &lt;a href=&#34;http://espebra.github.io/website/post/el6-rootfs-on-tmpfs&#34;&gt;previous patch&lt;/a&gt; no longer works as it should. I’ve updated the patch, and here it is:&lt;/p&gt;
 
 &lt;pre&gt;&lt;code&gt;--- original    2013-03-20 16:25:23.698846581 +0100
 +++ new 2013-03-21 08:58:11.175339694 +0100
@@ -399,16 +399,16 @@ sys 0m0.002s
  ROOTFLAGS=&amp;quot;$(getarg rootflags)&amp;quot;
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;It may be easier to download it from &lt;a href=&#34;/resources/patch.sl64.txt&#34;&gt;here&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;It may be easier to download it from &lt;a href=&#34;http://espebra.github.io/website/resources/patch.sl64.txt&#34;&gt;here&lt;/a&gt;.&lt;/p&gt;
 </description>
     </item>
     
     <item>
       <title>KVM/Xen and libvirt: currentMemory, memory and ballooning. Where did my memory go?</title>
-      <link>/post/memory-ballooning/</link>
+      <link>http://espebra.github.io/website/post/memory-ballooning/</link>
       <pubDate>Mon, 24 Sep 2012 16:58:32 &#43;0100</pubDate>
       <author>Espen Braastad</author>
-      <guid>/post/memory-ballooning/</guid>
+      <guid>http://espebra.github.io/website/post/memory-ballooning/</guid>
       <description>&lt;p&gt;KVM and Xen provide a method to change the amount of memory in use by guests at runtime. The method is called memory ballooning [&lt;a href=&#34;http://www.linux-kvm.org/page/FAQ#Is_dynamic_memory_management_for_guests_supported.3F&#34;&gt;1&lt;/a&gt;, &lt;a href=&#34;http://rwmj.wordpress.com/2010/07/17/virtio-balloon&#34;&gt;2&lt;/a&gt;], and it must be supported by the guest operating system to work.&lt;/p&gt;
 
 &lt;p&gt;In libvirt, memory allocation (and hence the ballooning capability) for a guest can be configured using the &lt;code&gt;memory&lt;/code&gt;, &lt;code&gt;currentMemory&lt;/code&gt; and &lt;code&gt;memballoon&lt;/code&gt; tags:&lt;/p&gt;
@@ -448,16 +448,16 @@ Managed save:   no
 
 &lt;p&gt;The graphs below show different guests (RHEL6, SL6 and Ubuntu Precise) on KVM (SL6) and Xen (RHEL5). The Y-axis show the amount of memory visible inside the guest (as reported by &lt;code&gt;free -m&lt;/code&gt;), while the X-axis show the value of memory. The value of currentMemory is 1024M in all plots – which means that the guests should use 1024M of memory and that the graphs should stay flat out at 1024M, given zero overhead. The graphs show that this is not the reality.&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&#34;/img/kvm-precise-1024.png&#34; alt=&#34;KVM, Ubuntu Precise, 1024 MB ram&#34; /&gt;
+&lt;p&gt;&lt;img src=&#34;http://espebra.github.io/website/img/kvm-precise-1024.png&#34; alt=&#34;KVM, Ubuntu Precise, 1024 MB ram&#34; /&gt;
 &lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&#34;/img/kvm-rhel6-1024.png&#34; alt=&#34;KVM, RHEL6, 1024 MB ram&#34; /&gt;
+&lt;p&gt;&lt;img src=&#34;http://espebra.github.io/website/img/kvm-rhel6-1024.png&#34; alt=&#34;KVM, RHEL6, 1024 MB ram&#34; /&gt;
 &lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&#34;/img/xen-sl6-1024.png&#34; alt=&#34;Xen, SL6, 1024 MB ram&#34; /&gt;
+&lt;p&gt;&lt;img src=&#34;http://espebra.github.io/website/img/xen-sl6-1024.png&#34; alt=&#34;Xen, SL6, 1024 MB ram&#34; /&gt;
 &lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&#34;/img/xen-precise-1024.png&#34; alt=&#34;Xen, Ubuntu Precise, 1024 MB ram&#34; /&gt;
+&lt;p&gt;&lt;img src=&#34;http://espebra.github.io/website/img/xen-precise-1024.png&#34; alt=&#34;Xen, Ubuntu Precise, 1024 MB ram&#34; /&gt;
 &lt;/p&gt;
 
 &lt;p&gt;The graphs with KVM do not have values for 32G memory because the guests went ballistic and OOM-ed.&lt;/p&gt;
@@ -466,10 +466,10 @@ Managed save:   no
     
     <item>
       <title>Filebin available on http://filebin.net</title>
-      <link>/post/filebin-available/</link>
+      <link>http://espebra.github.io/website/post/filebin-available/</link>
       <pubDate>Fri, 27 Jul 2012 22:10:29 &#43;0100</pubDate>
       <author>Espen Braastad</author>
-      <guid>/post/filebin-available/</guid>
+      <guid>http://espebra.github.io/website/post/filebin-available/</guid>
       <description>&lt;p&gt;&lt;a href=&#34;http://filebin.net&#34;&gt;Filebin.net&lt;/a&gt; was created to try out the new &lt;a href=&#34;http://www.w3.org/TR/FileAPI/&#34;&gt;File API&lt;/a&gt; features in HTML5.&lt;/p&gt;
 
 &lt;p&gt;Filebin is a web application that is somewhat similar to a pastebin, except that it&amp;rsquo;s for files. It is written in Python, and the code is available on &lt;a href=&#34;http://github.com/espebra/filebin&#34;&gt;Github&lt;/a&gt;.&lt;/p&gt;
@@ -478,11 +478,11 @@ Managed save:   no
     
     <item>
       <title>CentOS/RHEL/SL 6: root filesystem on tmpfs</title>
-      <link>/post/el6-rootfs-on-tmpfs/</link>
+      <link>http://espebra.github.io/website/post/el6-rootfs-on-tmpfs/</link>
       <pubDate>Tue, 01 May 2012 21:44:19 &#43;0100</pubDate>
       <author>Espen Braastad</author>
-      <guid>/post/el6-rootfs-on-tmpfs/</guid>
-      <description>&lt;p&gt;UPDATE: The patch below has been updated &lt;a href=&#34;/post/el6-rootfs-on-tmpfs-update&#34;&gt;here&lt;/a&gt;.&lt;/p&gt;
+      <guid>http://espebra.github.io/website/post/el6-rootfs-on-tmpfs/</guid>
+      <description>&lt;p&gt;UPDATE: The patch below has been updated &lt;a href=&#34;http://espebra.github.io/website/post/el6-rootfs-on-tmpfs-update&#34;&gt;here&lt;/a&gt;.&lt;/p&gt;
 
 &lt;p&gt;There are several scenarios where conventional hard drives are not really needed. Examples are HPC cluster nodes, virtualization nodes, home theater streaming PCs, silent desktops, internet cafés and embedded systems. Hard drives tend to fail, they are slow, they consume power, they generate heat and noise, and they are quite expensive if you need/want something faster and more reliable than SATA.&lt;/p&gt;
 
@@ -501,7 +501,7 @@ Managed save:   no
 &lt;/ul&gt;
 
 &lt;p&gt;This is a screenshot from an ongoing boot process:
-&lt;img src=&#34;/img/centos6-from-tmpfs1.png&#34; alt=&#34;Boot process&#34; /&gt;
+&lt;img src=&#34;http://espebra.github.io/website/img/centos6-from-tmpfs1.png&#34; alt=&#34;Boot process&#34; /&gt;
 &lt;/p&gt;
 
 &lt;p&gt;Now to the procedure:&lt;/p&gt;
@@ -608,7 +608,7 @@ $ sudo livecd-iso-to-pxeboot centos6.iso
 &lt;p&gt;Now you are ready to boot one or multiple CentOS 6 in-memory instances over the network!&lt;/p&gt;
 
 &lt;p&gt;Another screenshot:
-&lt;img src=&#34;/img/centos6-from-tmpfs-details.png&#34; alt=&#34;losetup&#34; /&gt;
+&lt;img src=&#34;http://espebra.github.io/website/img/centos6-from-tmpfs-details.png&#34; alt=&#34;losetup&#34; /&gt;
 &lt;/p&gt;
 
 &lt;p&gt;Feature request &lt;a href=&#34;http://article.gmane.org/gmane.linux.kernel.initramfs/2588&#34;&gt;upstream&lt;/a&gt;.&lt;/p&gt;
@@ -617,10 +617,10 @@ $ sudo livecd-iso-to-pxeboot centos6.iso
     
     <item>
       <title>KVM with iPXE in RHEL6</title>
-      <link>/post/kvm-with-ipxe-in-rhel6/</link>
+      <link>http://espebra.github.io/website/post/kvm-with-ipxe-in-rhel6/</link>
       <pubDate>Wed, 02 Nov 2011 22:29:50 CET</pubDate>
       <author>Espen Braastad</author>
-      <guid>/post/kvm-with-ipxe-in-rhel6/</guid>
+      <guid>http://espebra.github.io/website/post/kvm-with-ipxe-in-rhel6/</guid>
       <description>&lt;p&gt;A while ago I discovered the amazing &lt;a href=&#34;http://ipxe.org&#34;&gt;iPXE&lt;/a&gt; project. It is a complete PXE implementation with lots of nifty features, based on the &lt;a href=&#34;http://etherboot.org/&#34;&gt;gPXE&lt;/a&gt; project. Redhat ships the gPXE firmware for qemu and KVM, and you might want to use iPXE instead as the iPXE project currently seems to be more active. The major features (copied from &lt;a href=&#34;http://ipxe.org&#34;&gt;ipxe.org&lt;/a&gt;):&lt;/p&gt;
 
 &lt;ul&gt;
@@ -705,10 +705,10 @@ espen@luft:~/git/ipxe/src$
     
     <item>
       <title>munincollector-ng</title>
-      <link>/post/munincollector-ng/</link>
+      <link>http://espebra.github.io/website/post/munincollector-ng/</link>
       <pubDate>Mon, 16 Aug 2010 20:15:00 &#43;0100</pubDate>
       <author>Espen Braastad</author>
-      <guid>/post/munincollector-ng/</guid>
+      <guid>http://espebra.github.io/website/post/munincollector-ng/</guid>
       <description>&lt;p&gt;Munincollector-ng is a perl script that collects graphs from multiple &lt;a href=&#34;http://munin-monitoring.org&#34;&gt;munin&lt;/a&gt; installations to display them in one page. A scenario where this is helpful is when you have (too) many munin clients on (too) many munin masters, and you want to look through some of the graphs - i.e. the &lt;em&gt;Disk usage in percent&lt;/em&gt; (aka &lt;em&gt;df&lt;/em&gt;) plugin - without spending/wasting too much time browsing through the less important graphs.&lt;/p&gt;
 
 &lt;p&gt;It consists of one perl script and one configuration file. It is being executed regularly by cron. At each run, it iterates through the configuration file; downloads the graphs to a local directory and generates an html file.&lt;/p&gt;

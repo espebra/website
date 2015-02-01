@@ -10,19 +10,19 @@
   <title> CentOS/RHEL/SL 6: root filesystem on tmpfs, UPDATE &middot; Espen Braastad </title>
 
   
-  <link rel="stylesheet" href="/css/poole.css">
-  <link rel="stylesheet" href="/css/syntax.css">
-  <link rel="stylesheet" href="/css/hyde.css">
+  <link rel="stylesheet" href="http://espebra.github.io/website/css/poole.css">
+  <link rel="stylesheet" href="http://espebra.github.io/website/css/syntax.css">
+  <link rel="stylesheet" href="http://espebra.github.io/website/css/hyde.css">
   <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=PT+Sans:400,400italic,700|Abril+Fatface">
 
   
-  <link rel="stylesheet" href="/highlightjs/default.min.css">
-  <script src="/highlightjs/highlight.min.js"></script>
+  <link rel="stylesheet" href="http://espebra.github.io/website/highlightjs/default.min.css">
+  <script src="http://espebra.github.io/website/highlightjs/highlight.min.js"></script>
   <script>hljs.initHighlightingOnLoad();</script>
 
   
-  <link rel="apple-touch-icon-precomposed" sizes="144x144" href="/apple-touch-icon-144-precomposed.png">
-  <link rel="shortcut icon" href="/favicon.ico">
+  <link rel="apple-touch-icon-precomposed" sizes="144x144" href="http://espebra.github.io/website/apple-touch-icon-144-precomposed.png">
+  <link rel="shortcut icon" href="http://espebra.github.io/website/favicon.ico">
 
   
   <link href="" rel="alternate" type="application/rss+xml" title="Espen Braastad" />
@@ -48,9 +48,9 @@
     </div>
 
     <ul class="sidebar-nav">
-      <li><a href="/">Home</a> </li>
+      <li><a href="http://espebra.github.io/website/">Home</a> </li>
       
-        <li><a href="/post">Posts</a></li>
+        <li><a href="http://espebra.github.io/website/post">Posts</a></li>
     </ul>
   </div>
 </div>
@@ -60,7 +60,7 @@
       <div class="post">
         <h1>CentOS/RHEL/SL 6: root filesystem on tmpfs, UPDATE</h1>
         <span class="post-date">Thu, Mar 21, 2013</span>
-        <p>In EL6.4, the file <code>/usr/share/dracut/modules.d/90dmsquash-live/dmsquash-live-root</code> was updated so that the <a href="/post/el6-rootfs-on-tmpfs">previous patch</a> no longer works as it should. I’ve updated the patch, and here it is:</p>
+        <p>In EL6.4, the file <code>/usr/share/dracut/modules.d/90dmsquash-live/dmsquash-live-root</code> was updated so that the <a href="http://espebra.github.io/website/post/el6-rootfs-on-tmpfs">previous patch</a> no longer works as it should. I’ve updated the patch, and here it is:</p>
 
 <pre><code>--- original    2013-03-20 16:25:23.698846581 +0100
 +++ new 2013-03-21 08:58:11.175339694 +0100
@@ -156,7 +156,7 @@
  ROOTFLAGS=&quot;$(getarg rootflags)&quot;
 </code></pre>
 
-<p>It may be easier to download it from <a href="/resources/patch.sl64.txt">here</a>.</p>
+<p>It may be easier to download it from <a href="http://espebra.github.io/website/resources/patch.sl64.txt">here</a>.</p>
 
         <div id="disqus_thread"></div>
 <script type="text/javascript">
