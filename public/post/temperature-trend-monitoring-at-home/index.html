@@ -10,19 +10,19 @@
   <title> Temperature trend monitoring at home &middot; Espen Braastad </title>
 
   
-  <link rel="stylesheet" href="/css/poole.css">
-  <link rel="stylesheet" href="/css/syntax.css">
-  <link rel="stylesheet" href="/css/hyde.css">
+  <link rel="stylesheet" href="http://espebra.github.io/website/css/poole.css">
+  <link rel="stylesheet" href="http://espebra.github.io/website/css/syntax.css">
+  <link rel="stylesheet" href="http://espebra.github.io/website/css/hyde.css">
   <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=PT+Sans:400,400italic,700|Abril+Fatface">
 
   
-  <link rel="stylesheet" href="/highlightjs/default.min.css">
-  <script src="/highlightjs/highlight.min.js"></script>
+  <link rel="stylesheet" href="http://espebra.github.io/website/highlightjs/default.min.css">
+  <script src="http://espebra.github.io/website/highlightjs/highlight.min.js"></script>
   <script>hljs.initHighlightingOnLoad();</script>
 
   
-  <link rel="apple-touch-icon-precomposed" sizes="144x144" href="/apple-touch-icon-144-precomposed.png">
-  <link rel="shortcut icon" href="/favicon.ico">
+  <link rel="apple-touch-icon-precomposed" sizes="144x144" href="http://espebra.github.io/website/apple-touch-icon-144-precomposed.png">
+  <link rel="shortcut icon" href="http://espebra.github.io/website/favicon.ico">
 
   
   <link href="" rel="alternate" type="application/rss+xml" title="Espen Braastad" />
@@ -48,9 +48,9 @@
     </div>
 
     <ul class="sidebar-nav">
-      <li><a href="/">Home</a> </li>
+      <li><a href="http://espebra.github.io/website/">Home</a> </li>
       
-        <li><a href="/post">Posts</a></li>
+        <li><a href="http://espebra.github.io/website/post">Posts</a></li>
     </ul>
   </div>
 </div>
@@ -72,7 +72,7 @@
 
 <p>Some temperature sensors are required. Price is an important factor, but so is accuracy. I settled with some sensors from the <a href="http://www.raphnet.net/electronique/usbtenki/index_en.php">USBTenki</a> project. Schematics and software are open source, so you can assemble the sensors yourself if you want to. I didn’t want to, so I bought them ready to run from <a href="http://www.dracal.com/store/products/usbtenki/index.php">Dracal</a>.</p>
 
-<p><img src="/img/usbtenki_sensor_on_table.png" alt="Sensor" />
+<p><img src="http://espebra.github.io/website/img/usbtenki_sensor_on_table.png" alt="Sensor" />
 </p>
 
 <ul>
@@ -105,16 +105,16 @@ sudo apt-get install munin munin-node
 
 <p>A couple of the sensors are mounted in the ventilation tubes for permanent monitoring, and the other ones are used for temporary monitoring at various locations.</p>
 
-<p><img src="/img/usbtenki_sensor_mounted.png" alt="Sensor" />
+<p><img src="http://espebra.github.io/website/img/usbtenki_sensor_mounted.png" alt="Sensor" />
 </p>
 
 <p>Since the number of sensors and the locations will vary, I need a munin plugin that is flexible. I wrote a simple multigraph plugin that will detect new sensors and create a new graph per sensor that is added. These graphs are completely standardised and (frankly) pretty boring:</p>
 
-<p><img src="/img/sensor_905270-week.png" alt="Sensor" />
+<p><img src="http://espebra.github.io/website/img/sensor_905270-week.png" alt="Sensor" />
 
-<img src="/img/sensor_E10084-week.png" alt="Sensor" />
+<img src="http://espebra.github.io/website/img/sensor_E10084-week.png" alt="Sensor" />
 
-<img src="/img/sensor_E10087-week.png" alt="Sensor" />
+<img src="http://espebra.github.io/website/img/sensor_E10087-week.png" alt="Sensor" />
 </p>
 
 <p>Data loaning is used to aggregate the different sensor data and to modify their presentation (type, colour, label, etc) as I see fit, without having to modify the plugin itself. This will ensure that old sensor data is kept whenever modifications are made, and the data from each sensor can be used in multiple aggregated graphs if needed.</p>
@@ -145,10 +145,10 @@ sudo apt-get install munin munin-node
     temp.E10090.label Air intake (inside)
 </code></pre>
 
-<p><img src="/img/temp-week.png" alt="Aggregated, by week" />
+<p><img src="http://espebra.github.io/website/img/temp-week.png" alt="Aggregated, by week" />
 </p>
 
-<p><img src="/img/temp-day.png" alt="Aggregated, by day" />
+<p><img src="http://espebra.github.io/website/img/temp-day.png" alt="Aggregated, by day" />
 </p>
 
 <p>Air flow, carbon dioxide, humidity and power consumption are other aspects that are interesting to monitor as well, but those will have to wait until I find reasonably priced sensors with satisfying accuracy and quality.</p>

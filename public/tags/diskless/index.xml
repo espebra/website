@@ -2,24 +2,24 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Diskless on Espen Braastad</title>
-    <link>/tags/diskless/</link>
+    <link>http://espebra.github.io/website/tags/diskless/</link>
     <description>Recent content in Diskless on Espen Braastad</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <author>Espen Braastad</author>
     
     <lastBuildDate>Sun, 23 Jun 2013 21:44:19 &#43;0100</lastBuildDate>
-    <atom:link href="/tags/diskless/index.xml" rel="self" type="application/rss+xml" />
+    <atom:link href="http://espebra.github.io/website/tags/diskless/index.xml" rel="self" type="application/rss+xml" />
     
     <item>
       <title>CentOS/RHEL/SL 6: root filesystem on tmpfs, UPDATE #2</title>
-      <link>/post/el6-rootfs-on-tmpfs-update2/</link>
+      <link>http://espebra.github.io/website/post/el6-rootfs-on-tmpfs-update2/</link>
       <pubDate>Sun, 23 Jun 2013 21:44:19 &#43;0100</pubDate>
       <author>Espen Braastad</author>
-      <guid>/post/el6-rootfs-on-tmpfs-update2/</guid>
+      <guid>http://espebra.github.io/website/post/el6-rootfs-on-tmpfs-update2/</guid>
       <description>
 
-&lt;p&gt;In a &lt;a href=&#34;/post/el6-rootfs-on-tmpfs&#34;&gt;previous post&lt;/a&gt;, I’ve explained how to boot EL6 from memory without having / needing a physical disk.&lt;/p&gt;
+&lt;p&gt;In a &lt;a href=&#34;http://espebra.github.io/website/post/el6-rootfs-on-tmpfs&#34;&gt;previous post&lt;/a&gt;, I’ve explained how to boot EL6 from memory without having / needing a physical disk.&lt;/p&gt;
 
 &lt;p&gt;A bright reader, Jeff, came up with an alternative method. This alternative method does not involve dd’ing the image into a loop device, but instead copying the contents of the disk image directly into tmpfs. The result is higher write/read performance and generally lower memory requirements. The latter because unused disk space does not consume memory, which is important to consider when choosing the method to use in production systems.&lt;/p&gt;
 
@@ -121,11 +121,11 @@ sys 0m0.002s
     
     <item>
       <title>CentOS/RHEL/SL 6: root filesystem on tmpfs, UPDATE</title>
-      <link>/post/el6-rootfs-on-tmpfs-update/</link>
+      <link>http://espebra.github.io/website/post/el6-rootfs-on-tmpfs-update/</link>
       <pubDate>Thu, 21 Mar 2013 09:57:00 CET</pubDate>
       <author>Espen Braastad</author>
-      <guid>/post/el6-rootfs-on-tmpfs-update/</guid>
-      <description>&lt;p&gt;In EL6.4, the file &lt;code&gt;/usr/share/dracut/modules.d/90dmsquash-live/dmsquash-live-root&lt;/code&gt; was updated so that the &lt;a href=&#34;/post/el6-rootfs-on-tmpfs&#34;&gt;previous patch&lt;/a&gt; no longer works as it should. I’ve updated the patch, and here it is:&lt;/p&gt;
+      <guid>http://espebra.github.io/website/post/el6-rootfs-on-tmpfs-update/</guid>
+      <description>&lt;p&gt;In EL6.4, the file &lt;code&gt;/usr/share/dracut/modules.d/90dmsquash-live/dmsquash-live-root&lt;/code&gt; was updated so that the &lt;a href=&#34;http://espebra.github.io/website/post/el6-rootfs-on-tmpfs&#34;&gt;previous patch&lt;/a&gt; no longer works as it should. I’ve updated the patch, and here it is:&lt;/p&gt;
 
 &lt;pre&gt;&lt;code&gt;--- original    2013-03-20 16:25:23.698846581 +0100
 +++ new 2013-03-21 08:58:11.175339694 +0100
@@ -221,17 +221,17 @@ sys 0m0.002s
  ROOTFLAGS=&amp;quot;$(getarg rootflags)&amp;quot;
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;It may be easier to download it from &lt;a href=&#34;/resources/patch.sl64.txt&#34;&gt;here&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;It may be easier to download it from &lt;a href=&#34;http://espebra.github.io/website/resources/patch.sl64.txt&#34;&gt;here&lt;/a&gt;.&lt;/p&gt;
 </description>
     </item>
     
     <item>
       <title>CentOS/RHEL/SL 6: root filesystem on tmpfs</title>
-      <link>/post/el6-rootfs-on-tmpfs/</link>
+      <link>http://espebra.github.io/website/post/el6-rootfs-on-tmpfs/</link>
       <pubDate>Tue, 01 May 2012 21:44:19 &#43;0100</pubDate>
       <author>Espen Braastad</author>
-      <guid>/post/el6-rootfs-on-tmpfs/</guid>
-      <description>&lt;p&gt;UPDATE: The patch below has been updated &lt;a href=&#34;/post/el6-rootfs-on-tmpfs-update&#34;&gt;here&lt;/a&gt;.&lt;/p&gt;
+      <guid>http://espebra.github.io/website/post/el6-rootfs-on-tmpfs/</guid>
+      <description>&lt;p&gt;UPDATE: The patch below has been updated &lt;a href=&#34;http://espebra.github.io/website/post/el6-rootfs-on-tmpfs-update&#34;&gt;here&lt;/a&gt;.&lt;/p&gt;
 
 &lt;p&gt;There are several scenarios where conventional hard drives are not really needed. Examples are HPC cluster nodes, virtualization nodes, home theater streaming PCs, silent desktops, internet cafés and embedded systems. Hard drives tend to fail, they are slow, they consume power, they generate heat and noise, and they are quite expensive if you need/want something faster and more reliable than SATA.&lt;/p&gt;
 
@@ -250,7 +250,7 @@ sys 0m0.002s
 &lt;/ul&gt;
 
 &lt;p&gt;This is a screenshot from an ongoing boot process:
-&lt;img src=&#34;/img/centos6-from-tmpfs1.png&#34; alt=&#34;Boot process&#34; /&gt;
+&lt;img src=&#34;http://espebra.github.io/website/img/centos6-from-tmpfs1.png&#34; alt=&#34;Boot process&#34; /&gt;
 &lt;/p&gt;
 
 &lt;p&gt;Now to the procedure:&lt;/p&gt;
@@ -357,7 +357,7 @@ $ sudo livecd-iso-to-pxeboot centos6.iso
 &lt;p&gt;Now you are ready to boot one or multiple CentOS 6 in-memory instances over the network!&lt;/p&gt;
 
 &lt;p&gt;Another screenshot:
-&lt;img src=&#34;/img/centos6-from-tmpfs-details.png&#34; alt=&#34;losetup&#34; /&gt;
+&lt;img src=&#34;http://espebra.github.io/website/img/centos6-from-tmpfs-details.png&#34; alt=&#34;losetup&#34; /&gt;
 &lt;/p&gt;
 
 &lt;p&gt;Feature request &lt;a href=&#34;http://article.gmane.org/gmane.linux.kernel.initramfs/2588&#34;&gt;upstream&lt;/a&gt;.&lt;/p&gt;

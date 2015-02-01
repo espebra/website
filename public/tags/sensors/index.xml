@@ -2,21 +2,21 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Sensors on Espen Braastad</title>
-    <link>/tags/sensors/</link>
+    <link>http://espebra.github.io/website/tags/sensors/</link>
     <description>Recent content in Sensors on Espen Braastad</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <author>Espen Braastad</author>
     
     <lastBuildDate>Wed, 19 Feb 2014 23:32:00 CET</lastBuildDate>
-    <atom:link href="/tags/sensors/index.xml" rel="self" type="application/rss+xml" />
+    <atom:link href="http://espebra.github.io/website/tags/sensors/index.xml" rel="self" type="application/rss+xml" />
     
     <item>
       <title>Temperature trend monitoring at home</title>
-      <link>/post/temperature-trend-monitoring-at-home/</link>
+      <link>http://espebra.github.io/website/post/temperature-trend-monitoring-at-home/</link>
       <pubDate>Wed, 19 Feb 2014 23:32:00 CET</pubDate>
       <author>Espen Braastad</author>
-      <guid>/post/temperature-trend-monitoring-at-home/</guid>
+      <guid>http://espebra.github.io/website/post/temperature-trend-monitoring-at-home/</guid>
       <description>
 
 &lt;h2 id=&#34;background:88f8b93192da3e559035b25b4d4944bf&#34;&gt;Background&lt;/h2&gt;
@@ -29,7 +29,7 @@
 
 &lt;p&gt;Some temperature sensors are required. Price is an important factor, but so is accuracy. I settled with some sensors from the &lt;a href=&#34;http://www.raphnet.net/electronique/usbtenki/index_en.php&#34;&gt;USBTenki&lt;/a&gt; project. Schematics and software are open source, so you can assemble the sensors yourself if you want to. I didn’t want to, so I bought them ready to run from &lt;a href=&#34;http://www.dracal.com/store/products/usbtenki/index.php&#34;&gt;Dracal&lt;/a&gt;.&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&#34;/img/usbtenki_sensor_on_table.png&#34; alt=&#34;Sensor&#34; /&gt;
+&lt;p&gt;&lt;img src=&#34;http://espebra.github.io/website/img/usbtenki_sensor_on_table.png&#34; alt=&#34;Sensor&#34; /&gt;
 &lt;/p&gt;
 
 &lt;ul&gt;
@@ -62,16 +62,16 @@ sudo apt-get install munin munin-node
 
 &lt;p&gt;A couple of the sensors are mounted in the ventilation tubes for permanent monitoring, and the other ones are used for temporary monitoring at various locations.&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&#34;/img/usbtenki_sensor_mounted.png&#34; alt=&#34;Sensor&#34; /&gt;
+&lt;p&gt;&lt;img src=&#34;http://espebra.github.io/website/img/usbtenki_sensor_mounted.png&#34; alt=&#34;Sensor&#34; /&gt;
 &lt;/p&gt;
 
 &lt;p&gt;Since the number of sensors and the locations will vary, I need a munin plugin that is flexible. I wrote a simple multigraph plugin that will detect new sensors and create a new graph per sensor that is added. These graphs are completely standardised and (frankly) pretty boring:&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&#34;/img/sensor_905270-week.png&#34; alt=&#34;Sensor&#34; /&gt;
+&lt;p&gt;&lt;img src=&#34;http://espebra.github.io/website/img/sensor_905270-week.png&#34; alt=&#34;Sensor&#34; /&gt;
 
-&lt;img src=&#34;/img/sensor_E10084-week.png&#34; alt=&#34;Sensor&#34; /&gt;
+&lt;img src=&#34;http://espebra.github.io/website/img/sensor_E10084-week.png&#34; alt=&#34;Sensor&#34; /&gt;
 
-&lt;img src=&#34;/img/sensor_E10087-week.png&#34; alt=&#34;Sensor&#34; /&gt;
+&lt;img src=&#34;http://espebra.github.io/website/img/sensor_E10087-week.png&#34; alt=&#34;Sensor&#34; /&gt;
 &lt;/p&gt;
 
 &lt;p&gt;Data loaning is used to aggregate the different sensor data and to modify their presentation (type, colour, label, etc) as I see fit, without having to modify the plugin itself. This will ensure that old sensor data is kept whenever modifications are made, and the data from each sensor can be used in multiple aggregated graphs if needed.&lt;/p&gt;
@@ -102,10 +102,10 @@ sudo apt-get install munin munin-node
     temp.E10090.label Air intake (inside)
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;&lt;img src=&#34;/img/temp-week.png&#34; alt=&#34;Aggregated, by week&#34; /&gt;
+&lt;p&gt;&lt;img src=&#34;http://espebra.github.io/website/img/temp-week.png&#34; alt=&#34;Aggregated, by week&#34; /&gt;
 &lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&#34;/img/temp-day.png&#34; alt=&#34;Aggregated, by day&#34; /&gt;
+&lt;p&gt;&lt;img src=&#34;http://espebra.github.io/website/img/temp-day.png&#34; alt=&#34;Aggregated, by day&#34; /&gt;
 &lt;/p&gt;
 
 &lt;p&gt;Air flow, carbon dioxide, humidity and power consumption are other aspects that are interesting to monitor as well, but those will have to wait until I find reasonably priced sensors with satisfying accuracy and quality.&lt;/p&gt;
