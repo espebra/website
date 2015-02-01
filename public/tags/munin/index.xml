@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Munin on Espen Braastad</title>
+    <link>/tags/munin/</link>
+    <description>Recent content in Munin on Espen Braastad</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <author>Espen Braastad</author>
+    
+    <lastBuildDate>Wed, 19 Feb 2014 23:32:00 CET</lastBuildDate>
+    <atom:link href="/tags/munin/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Temperature trend monitoring at home</title>
+      <link>/post/temperature-trend-monitoring-at-home/</link>
+      <pubDate>Wed, 19 Feb 2014 23:32:00 CET</pubDate>
+      <author>Espen Braastad</author>
+      <guid>/post/temperature-trend-monitoring-at-home/</guid>
+      <description>
+
+&lt;h2 id=&#34;background:88f8b93192da3e559035b25b4d4944bf&#34;&gt;Background&lt;/h2&gt;
+
+&lt;p&gt;I’ve got balanced ventilation in my apartment. It works OK, but I don’t fully understand how it behaves if knobs are pushed and pots are turned, and I’m definitely not sure if its performance is as good as I should expect.&lt;/p&gt;
+
+&lt;p&gt;I’m going to do some measurements to see how the system reacts to changes in the outside temperature and tuning of the various settings. The first parameter to measure is the temperature in the air intake, exhaust air and some of the ventilation valves in the different rooms in the apartment.&lt;/p&gt;
+
+&lt;h2 id=&#34;hardware:88f8b93192da3e559035b25b4d4944bf&#34;&gt;Hardware&lt;/h2&gt;
+
+&lt;p&gt;Some temperature sensors are required. Price is an important factor, but so is accuracy. I settled with some sensors from the &lt;a href=&#34;http://www.raphnet.net/electronique/usbtenki/index_en.php&#34;&gt;USBTenki&lt;/a&gt; project. Schematics and software are open source, so you can assemble the sensors yourself if you want to. I didn’t want to, so I bought them ready to run from &lt;a href=&#34;http://www.dracal.com/store/products/usbtenki/index.php&#34;&gt;Dracal&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;/img/usbtenki_sensor_on_table.png&#34; alt=&#34;Sensor&#34; /&gt;
+&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;±0.5°C typical accuracy at 25°C&lt;/li&gt;
+&lt;li&gt;±1°C (max.) accuracy from -10°C to +85°C&lt;/li&gt;
+&lt;li&gt;±2°C (max.) accuracy from -10°C to +125°C&lt;/li&gt;
+&lt;li&gt;±3°C (max.) accuracy from -55°C to +125°C&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;The price is 29.99$ CAD per sensor and they ship internationally. I bought five sensors. In addition, I bought some USB extension cords and a cheap bus powered USB hub from &lt;a href=&#34;http://www.dx.com/&#34;&gt;Deal Extreme&lt;/a&gt; to allow all sensors to be connected simultaneously.&lt;/p&gt;
+
+&lt;h2 id=&#34;software:88f8b93192da3e559035b25b4d4944bf&#34;&gt;Software&lt;/h2&gt;
+
+&lt;p&gt;&lt;a href=&#34;http://munin-monitoring.org/&#34;&gt;Munin&lt;/a&gt; will be used to create graphs to show the temperature over time:&lt;/p&gt;
+
+&lt;p&gt;Munin is a networked resource monitoring tool that can help analyze resource trends and “what just happened to kill our performance?” problems. It is designed to be very plug and play. A default installation provides a lot of graphs with almost no work.&lt;/p&gt;
+
+&lt;p&gt;Munin is written in Perl and is available in the repositories of most Linux distributions. Installation is easy:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;# Fedora / Redhat / CentOS
+sudo yum install munin munin-node
+
+# Debian / Ubuntu
+sudo apt-get install munin munin-node
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;USBTenki host software is used to communicate with the sensors from Linux.&lt;/p&gt;
+
+&lt;h2 id=&#34;setup:88f8b93192da3e559035b25b4d4944bf&#34;&gt;Setup&lt;/h2&gt;
+
+&lt;p&gt;A couple of the sensors are mounted in the ventilation tubes for permanent monitoring, and the other ones are used for temporary monitoring at various locations.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;/img/usbtenki_sensor_mounted.png&#34; alt=&#34;Sensor&#34; /&gt;
+&lt;/p&gt;
+
+&lt;p&gt;Since the number of sensors and the locations will vary, I need a munin plugin that is flexible. I wrote a simple multigraph plugin that will detect new sensors and create a new graph per sensor that is added. These graphs are completely standardised and (frankly) pretty boring:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;/img/sensor_905270-week.png&#34; alt=&#34;Sensor&#34; /&gt;
+
+&lt;img src=&#34;/img/sensor_E10084-week.png&#34; alt=&#34;Sensor&#34; /&gt;
+
+&lt;img src=&#34;/img/sensor_E10087-week.png&#34; alt=&#34;Sensor&#34; /&gt;
+&lt;/p&gt;
+
+&lt;p&gt;Data loaning is used to aggregate the different sensor data and to modify their presentation (type, colour, label, etc) as I see fit, without having to modify the plugin itself. This will ensure that old sensor data is kept whenever modifications are made, and the data from each sensor can be used in multiple aggregated graphs if needed.&lt;/p&gt;
+
+&lt;p&gt;Data loaning configuration example and result:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;[sensor;ventilation]
+    address 127.0.0.1
+    use_node_name no
+    temp.update no
+    temp.graph_title Temperature
+    temp.graph_args --base 1000
+    temp.graph_vlabel Celcius
+    temp.graph_scale no
+    temp.graph_category temperature
+    temp.graph_order \
+        E10084=oslo;caesar:sensor_E10084.output \
+        E10090=oslo;caesar:sensor_E10090.output \
+        E10087=oslo;caesar:sensor_E10087.output 
+    temp.E10084.draw LINE1
+    temp.E10084.colour FF00FF
+    temp.E10084.label Air exhaust (inside)
+    temp.E10087.draw LINE1
+    temp.E10087.colour FF0000
+    temp.E10087.label Air intake (outside)
+    temp.E10090.draw LINE1
+    temp.E10090.colour 00FF00
+    temp.E10090.label Air intake (inside)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;img src=&#34;/img/temp-week.png&#34; alt=&#34;Aggregated, by week&#34; /&gt;
+&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;/img/temp-day.png&#34; alt=&#34;Aggregated, by day&#34; /&gt;
+&lt;/p&gt;
+
+&lt;p&gt;Air flow, carbon dioxide, humidity and power consumption are other aspects that are interesting to monitor as well, but those will have to wait until I find reasonably priced sensors with satisfying accuracy and quality.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>munincollector-ng</title>
+      <link>/post/munincollector-ng/</link>
+      <pubDate>Mon, 16 Aug 2010 20:15:00 &#43;0100</pubDate>
+      <author>Espen Braastad</author>
+      <guid>/post/munincollector-ng/</guid>
+      <description>&lt;p&gt;Munincollector-ng is a perl script that collects graphs from multiple &lt;a href=&#34;http://munin-monitoring.org&#34;&gt;munin&lt;/a&gt; installations to display them in one page. A scenario where this is helpful is when you have (too) many munin clients on (too) many munin masters, and you want to look through some of the graphs - i.e. the &lt;em&gt;Disk usage in percent&lt;/em&gt; (aka &lt;em&gt;df&lt;/em&gt;) plugin - without spending/wasting too much time browsing through the less important graphs.&lt;/p&gt;
+
+&lt;p&gt;It consists of one perl script and one configuration file. It is being executed regularly by cron. At each run, it iterates through the configuration file; downloads the graphs to a local directory and generates an html file.&lt;/p&gt;
+
+&lt;p&gt;Below is some example configuration that will gather the &lt;em&gt;week&lt;/em&gt; and &lt;em&gt;month&lt;/em&gt; graphs from the &lt;em&gt;df&lt;/em&gt; plugin from four separate munin masters (three without authentication and one with authentication). The graphs will be downloaded to &lt;em&gt;/var/www/munincollector-ng/&lt;/em&gt;:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;# General configuration
+graph.plugin df
+graph.type week month
+graph.log /var/log/munincollector-ng.log
+graph.dir /var/www/munincollector-ng
+
+# Configuration per munin master you want to collect graphs from.
+# The format is: &amp;lt;id&amp;gt;.&amp;lt;option&amp;gt; &amp;lt;value&amp;gt;
+
+# Three munin installations with no authentication
+uio.url http://munin.ping.uio.no
+foo.url http://foo.com/munin/
+bar.url http://bar.com/munin/
+
+# One munin master that requires authentication
+baz.url http://baz.com/munin/
+baz.realm Munin
+baz.username user1
+baz.password pass1
+baz.netloc baz.com:80
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;An example cron job that will execute the script once per day (make sure &lt;em&gt;user&lt;/em&gt; have write permissions in &lt;em&gt;/var/www/munincollector-ng/&lt;/em&gt;):&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;8 8 * * * user /usr/local/bin/munincollector-ng -c /etc/munincollector-ng/example.conf
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;The script is available from &lt;a href=&#34;https://github.com/espebra/munincollector-ng&#34;&gt;Github&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;PS: Put the &lt;em&gt;logo.png&lt;/em&gt; and &lt;em&gt;style.css&lt;/em&gt; from your &lt;em&gt;/etc/munin/templates/&lt;/em&gt; directory into &lt;em&gt;/var/www/munincollector-ng/&lt;/em&gt; to make it look a bit nicer.&lt;/p&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>

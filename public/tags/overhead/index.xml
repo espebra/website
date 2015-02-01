@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Overhead on Espen Braastad</title>
+    <link>/tags/overhead/</link>
+    <description>Recent content in Overhead on Espen Braastad</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <author>Espen Braastad</author>
+    
+    <lastBuildDate>Mon, 24 Sep 2012 16:58:32 &#43;0100</lastBuildDate>
+    <atom:link href="/tags/overhead/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>KVM/Xen and libvirt: currentMemory, memory and ballooning. Where did my memory go?</title>
+      <link>/post/memory-ballooning/</link>
+      <pubDate>Mon, 24 Sep 2012 16:58:32 &#43;0100</pubDate>
+      <author>Espen Braastad</author>
+      <guid>/post/memory-ballooning/</guid>
+      <description>&lt;p&gt;KVM and Xen provide a method to change the amount of memory in use by guests at runtime. The method is called memory ballooning [&lt;a href=&#34;http://www.linux-kvm.org/page/FAQ#Is_dynamic_memory_management_for_guests_supported.3F&#34;&gt;1&lt;/a&gt;, &lt;a href=&#34;http://rwmj.wordpress.com/2010/07/17/virtio-balloon&#34;&gt;2&lt;/a&gt;], and it must be supported by the guest operating system to work.&lt;/p&gt;
+
+&lt;p&gt;In libvirt, memory allocation (and hence the ballooning capability) for a guest can be configured using the &lt;code&gt;memory&lt;/code&gt;, &lt;code&gt;currentMemory&lt;/code&gt; and &lt;code&gt;memballoon&lt;/code&gt; tags:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;&amp;lt;domain type=&#39;kvm&#39;&amp;gt;
+  [...]
+  &amp;lt;memory unit=&#39;KiB&#39;&amp;gt;16777216&amp;lt;/memory&amp;gt;
+  &amp;lt;currentMemory unit=&#39;KiB&#39;&amp;gt;1048576&amp;lt;/currentMemory&amp;gt;
+  [...]
+  &amp;lt;devices&amp;gt;
+    &amp;lt;memballoon model=&#39;virtio&#39;/&amp;gt;
+  &amp;lt;/devices&amp;gt;
+&amp;lt;/domain&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;The guest can never use more memory than specified in the &lt;code&gt;memory&lt;/code&gt; tag and it is the amount of memory the guest will use at boot time. The &lt;code&gt;currentMemory&lt;/code&gt; tag, if set, should be less than or equal (default) to &lt;code&gt;memory&lt;/code&gt;. The guest will, when the balloon driver is loaded some time during the boot process, adjust itself to use the amount of memory specified by &lt;code&gt;currentMemory&lt;/code&gt;. The &lt;code&gt;memballoon&lt;/code&gt; tag is being added automatically, so there is really no need to specify it.&lt;/p&gt;
+
+&lt;p&gt;The command line tool &lt;code&gt;virsh&lt;/code&gt; can later be used on the host to see the current memory configuration for each guest:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;[root@host ~]# virsh dominfo guest
+Id:             -
+Name:           guest
+UUID:           4f610a1f-7539-47cf-8299-9534500b340d
+OS Type:        hvm
+State:          shut off
+CPU(s):         1
+Max memory:     16777216 kB
+Used memory:    1048576 kB
+Persistent:     yes
+Autostart:      disable
+Managed save:   no
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;So far, so good. At this point it makes sense to set &lt;code&gt;memory&lt;/code&gt; really high on all guests to ensure that we are able to reallocate memory on the fly for all our Linux guests. Doing this might not be a good idea.&lt;/p&gt;
+
+&lt;p&gt;Linux as a guest, even though it has a balloon driver, does not seem to behave like one would expect. When &lt;code&gt;memory&lt;/code&gt; is set higher than &lt;code&gt;currentMemory&lt;/code&gt;, the guest operating system does not see (or use) the amount of memory that it should. Ideally, the value that libvirt reports as Used memory at the host should be visible inside the guest also.&lt;/p&gt;
+
+&lt;p&gt;The graphs below show different guests (RHEL6, SL6 and Ubuntu Precise) on KVM (SL6) and Xen (RHEL5). The Y-axis show the amount of memory visible inside the guest (as reported by &lt;code&gt;free -m&lt;/code&gt;), while the X-axis show the value of memory. The value of currentMemory is 1024M in all plots – which means that the guests should use 1024M of memory and that the graphs should stay flat out at 1024M, given zero overhead. The graphs show that this is not the reality.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;/img/kvm-precise-1024.png&#34; alt=&#34;KVM, Ubuntu Precise, 1024 MB ram&#34; /&gt;
+&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;/img/kvm-rhel6-1024.png&#34; alt=&#34;KVM, RHEL6, 1024 MB ram&#34; /&gt;
+&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;/img/xen-sl6-1024.png&#34; alt=&#34;Xen, SL6, 1024 MB ram&#34; /&gt;
+&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;/img/xen-precise-1024.png&#34; alt=&#34;Xen, Ubuntu Precise, 1024 MB ram&#34; /&gt;
+&lt;/p&gt;
+
+&lt;p&gt;The graphs with KVM do not have values for 32G memory because the guests went ballistic and OOM-ed.&lt;/p&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>

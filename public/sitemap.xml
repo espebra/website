@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  
+  <url>
+    <loc>/</loc>
+    <lastmod>2014-08-30T20:48:00+01:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>/post/remote-console-on-hp-proliant-microserver-g7-n54l/</loc>
+    <lastmod>2014-08-30T20:48:00+01:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/post/altibox-tv-and-data-over-the-same-ethernet-cable/</loc>
+    <lastmod>2014-05-22T22:41:00+01:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/post/temperature-trend-monitoring-at-home/</loc>
+    <lastmod>2014-02-19T23:32:00+01:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/post/el6-rootfs-on-tmpfs-update2/</loc>
+    <lastmod>2013-06-23T21:44:19+01:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/post/el6-rootfs-on-tmpfs-update/</loc>
+    <lastmod>2013-03-21T09:57:00+01:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/post/memory-ballooning/</loc>
+    <lastmod>2012-09-24T16:58:32+01:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/post/filebin-available/</loc>
+    <lastmod>2012-07-27T22:10:29+01:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/post/el6-rootfs-on-tmpfs/</loc>
+    <lastmod>2012-05-01T21:44:19+01:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/post/kvm-with-ipxe-in-rhel6/</loc>
+    <lastmod>2011-11-02T22:29:50+01:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/post/munincollector-ng/</loc>
+    <lastmod>2010-08-16T20:15:00+01:00</lastmod>
+  </url>
+  
+</urlset>

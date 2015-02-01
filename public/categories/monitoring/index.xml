@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Monitoring on Espen Braastad</title>
+    <link>/categories/monitoring/</link>
+    <description>Recent content in Monitoring on Espen Braastad</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <author>Espen Braastad</author>
+    
+    <lastBuildDate>Mon, 16 Aug 2010 20:15:00 &#43;0100</lastBuildDate>
+    <atom:link href="/categories/monitoring/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>munincollector-ng</title>
+      <link>/post/munincollector-ng/</link>
+      <pubDate>Mon, 16 Aug 2010 20:15:00 &#43;0100</pubDate>
+      <author>Espen Braastad</author>
+      <guid>/post/munincollector-ng/</guid>
+      <description>&lt;p&gt;Munincollector-ng is a perl script that collects graphs from multiple &lt;a href=&#34;http://munin-monitoring.org&#34;&gt;munin&lt;/a&gt; installations to display them in one page. A scenario where this is helpful is when you have (too) many munin clients on (too) many munin masters, and you want to look through some of the graphs - i.e. the &lt;em&gt;Disk usage in percent&lt;/em&gt; (aka &lt;em&gt;df&lt;/em&gt;) plugin - without spending/wasting too much time browsing through the less important graphs.&lt;/p&gt;
+
+&lt;p&gt;It consists of one perl script and one configuration file. It is being executed regularly by cron. At each run, it iterates through the configuration file; downloads the graphs to a local directory and generates an html file.&lt;/p&gt;
+
+&lt;p&gt;Below is some example configuration that will gather the &lt;em&gt;week&lt;/em&gt; and &lt;em&gt;month&lt;/em&gt; graphs from the &lt;em&gt;df&lt;/em&gt; plugin from four separate munin masters (three without authentication and one with authentication). The graphs will be downloaded to &lt;em&gt;/var/www/munincollector-ng/&lt;/em&gt;:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;# General configuration
+graph.plugin df
+graph.type week month
+graph.log /var/log/munincollector-ng.log
+graph.dir /var/www/munincollector-ng
+
+# Configuration per munin master you want to collect graphs from.
+# The format is: &amp;lt;id&amp;gt;.&amp;lt;option&amp;gt; &amp;lt;value&amp;gt;
+
+# Three munin installations with no authentication
+uio.url http://munin.ping.uio.no
+foo.url http://foo.com/munin/
+bar.url http://bar.com/munin/
+
+# One munin master that requires authentication
+baz.url http://baz.com/munin/
+baz.realm Munin
+baz.username user1
+baz.password pass1
+baz.netloc baz.com:80
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;An example cron job that will execute the script once per day (make sure &lt;em&gt;user&lt;/em&gt; have write permissions in &lt;em&gt;/var/www/munincollector-ng/&lt;/em&gt;):&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;8 8 * * * user /usr/local/bin/munincollector-ng -c /etc/munincollector-ng/example.conf
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;The script is available from &lt;a href=&#34;https://github.com/espebra/munincollector-ng&#34;&gt;Github&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;PS: Put the &lt;em&gt;logo.png&lt;/em&gt; and &lt;em&gt;style.css&lt;/em&gt; from your &lt;em&gt;/etc/munin/templates/&lt;/em&gt; directory into &lt;em&gt;/var/www/munincollector-ng/&lt;/em&gt; to make it look a bit nicer.&lt;/p&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>

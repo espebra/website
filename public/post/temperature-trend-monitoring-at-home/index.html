@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
+<head>
+  <link href="http://gmpg.org/xfn/11" rel="profile">
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+
+  <title> Temperature trend monitoring at home &middot; Espen Braastad </title>
+
+  
+  <link rel="stylesheet" href="/css/poole.css">
+  <link rel="stylesheet" href="/css/syntax.css">
+  <link rel="stylesheet" href="/css/hyde.css">
+  <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=PT+Sans:400,400italic,700|Abril+Fatface">
+
+  
+  <link rel="stylesheet" href="/highlightjs/default.min.css">
+  <script src="/highlightjs/highlight.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script>
+
+  
+  <link rel="apple-touch-icon-precomposed" sizes="144x144" href="/apple-touch-icon-144-precomposed.png">
+  <link rel="shortcut icon" href="/favicon.ico">
+
+  
+  <link href="" rel="alternate" type="application/rss+xml" title="Espen Braastad" />
+
+  <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  
+    ga('create', 'UA-59220530-1', 'auto');
+    ga('send', 'pageview');
+  
+  </script>
+</head>
+
+  <body>
+
+    <div class="sidebar">
+  <div class="container sidebar-sticky">
+    <div class="sidebar-about">
+      <h1>Espen Braastad</h1>
+    </div>
+
+    <ul class="sidebar-nav">
+      <li><a href="/">Home</a> </li>
+      
+        <li><a href="/post">Posts</a></li>
+    </ul>
+  </div>
+</div>
+
+
+    <div class="content container">
+      <div class="post">
+        <h1>Temperature trend monitoring at home</h1>
+        <span class="post-date">Wed, Feb 19, 2014</span>
+        
+
+<h2 id="background:88f8b93192da3e559035b25b4d4944bf">Background</h2>
+
+<p>I’ve got balanced ventilation in my apartment. It works OK, but I don’t fully understand how it behaves if knobs are pushed and pots are turned, and I’m definitely not sure if its performance is as good as I should expect.</p>
+
+<p>I’m going to do some measurements to see how the system reacts to changes in the outside temperature and tuning of the various settings. The first parameter to measure is the temperature in the air intake, exhaust air and some of the ventilation valves in the different rooms in the apartment.</p>
+
+<h2 id="hardware:88f8b93192da3e559035b25b4d4944bf">Hardware</h2>
+
+<p>Some temperature sensors are required. Price is an important factor, but so is accuracy. I settled with some sensors from the <a href="http://www.raphnet.net/electronique/usbtenki/index_en.php">USBTenki</a> project. Schematics and software are open source, so you can assemble the sensors yourself if you want to. I didn’t want to, so I bought them ready to run from <a href="http://www.dracal.com/store/products/usbtenki/index.php">Dracal</a>.</p>
+
+<p><img src="/img/usbtenki_sensor_on_table.png" alt="Sensor" />
+</p>
+
+<ul>
+<li>±0.5°C typical accuracy at 25°C</li>
+<li>±1°C (max.) accuracy from -10°C to +85°C</li>
+<li>±2°C (max.) accuracy from -10°C to +125°C</li>
+<li>±3°C (max.) accuracy from -55°C to +125°C</li>
+</ul>
+
+<p>The price is 29.99$ CAD per sensor and they ship internationally. I bought five sensors. In addition, I bought some USB extension cords and a cheap bus powered USB hub from <a href="http://www.dx.com/">Deal Extreme</a> to allow all sensors to be connected simultaneously.</p>
+
+<h2 id="software:88f8b93192da3e559035b25b4d4944bf">Software</h2>
+
+<p><a href="http://munin-monitoring.org/">Munin</a> will be used to create graphs to show the temperature over time:</p>
+
+<p>Munin is a networked resource monitoring tool that can help analyze resource trends and “what just happened to kill our performance?” problems. It is designed to be very plug and play. A default installation provides a lot of graphs with almost no work.</p>
+
+<p>Munin is written in Perl and is available in the repositories of most Linux distributions. Installation is easy:</p>
+
+<pre><code># Fedora / Redhat / CentOS
+sudo yum install munin munin-node
+
+# Debian / Ubuntu
+sudo apt-get install munin munin-node
+</code></pre>
+
+<p>USBTenki host software is used to communicate with the sensors from Linux.</p>
+
+<h2 id="setup:88f8b93192da3e559035b25b4d4944bf">Setup</h2>
+
+<p>A couple of the sensors are mounted in the ventilation tubes for permanent monitoring, and the other ones are used for temporary monitoring at various locations.</p>
+
+<p><img src="/img/usbtenki_sensor_mounted.png" alt="Sensor" />
+</p>
+
+<p>Since the number of sensors and the locations will vary, I need a munin plugin that is flexible. I wrote a simple multigraph plugin that will detect new sensors and create a new graph per sensor that is added. These graphs are completely standardised and (frankly) pretty boring:</p>
+
+<p><img src="/img/sensor_905270-week.png" alt="Sensor" />
+
+<img src="/img/sensor_E10084-week.png" alt="Sensor" />
+
+<img src="/img/sensor_E10087-week.png" alt="Sensor" />
+</p>
+
+<p>Data loaning is used to aggregate the different sensor data and to modify their presentation (type, colour, label, etc) as I see fit, without having to modify the plugin itself. This will ensure that old sensor data is kept whenever modifications are made, and the data from each sensor can be used in multiple aggregated graphs if needed.</p>
+
+<p>Data loaning configuration example and result:</p>
+
+<pre><code>[sensor;ventilation]
+    address 127.0.0.1
+    use_node_name no
+    temp.update no
+    temp.graph_title Temperature
+    temp.graph_args --base 1000
+    temp.graph_vlabel Celcius
+    temp.graph_scale no
+    temp.graph_category temperature
+    temp.graph_order \
+        E10084=oslo;caesar:sensor_E10084.output \
+        E10090=oslo;caesar:sensor_E10090.output \
+        E10087=oslo;caesar:sensor_E10087.output 
+    temp.E10084.draw LINE1
+    temp.E10084.colour FF00FF
+    temp.E10084.label Air exhaust (inside)
+    temp.E10087.draw LINE1
+    temp.E10087.colour FF0000
+    temp.E10087.label Air intake (outside)
+    temp.E10090.draw LINE1
+    temp.E10090.colour 00FF00
+    temp.E10090.label Air intake (inside)
+</code></pre>
+
+<p><img src="/img/temp-week.png" alt="Aggregated, by week" />
+</p>
+
+<p><img src="/img/temp-day.png" alt="Aggregated, by day" />
+</p>
+
+<p>Air flow, carbon dioxide, humidity and power consumption are other aspects that are interesting to monitor as well, but those will have to wait until I find reasonably priced sensors with satisfying accuracy and quality.</p>
+
+        <div id="disqus_thread"></div>
+<script type="text/javascript">
+
+(function() {
+    
+    
+    if (window.location.hostname == "localhost") 
+        return;
+
+    var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+    var disqus_shortname = 'espebra';
+    var disqus_identifier = 'Temperature trend monitoring at home';
+
+    dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+})();
+</script>
+<noscript>Please enable JavaScript to view the comments powered by <a href="http://disqus.com/?ref_noscript">Disqus.</a></noscript>
+
+      </div>
+    </div>
+  </body>
+</html>
