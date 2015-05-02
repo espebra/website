@@ -94,4 +94,4 @@ The buit in help text is available with the ``help`` request header or query par
     predictable-content = {int}      Add predictable string to the response of given length
     response-status = {int}          Set the response status
 
-The Dummy API is written in Lua and is available for download at [Github](https://github.com/espebra/dummy-api). It will run on the [Openresty](http://openresty.org/) web application server.
+The Dummy API is written in Lua and is available for download at [Github](https://github.com/espebra/dummy-api). It will run on the [OpenResty](http://openresty.org/) web application server.
