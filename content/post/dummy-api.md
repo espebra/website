@@ -8,11 +8,11 @@ title = "Dummy API"
 
 +++
 
-The purpose of Dummy API to act as a performant, simple and flexible API to use when testing API gateway performance. The Dummy API will read the request headers and query parameters and generate the responses accordingly. Some examples are custom cache-control header, response status and response delays.
+The purpose of Dummy API to act as a performant, simple and flexible HTTP API to use when testing API gateway performance. The Dummy API will read the request headers and query parameters and generate the responses accordingly. Some examples are custom cache-control header, response status and response delays.
 
-Some examples are:
+The following is a``GET`` request to host ``dummy-api.varnish-software.com`` and path ``/foo``, where the response should contain a 10 characters random string, 20 characters predictable random string, response status ``418`` and a ``cache-control`` header with the value ``max-age=2, s-maxage=3``. The response will be delivered with a 2 seconds delay before the first byte of the body, to mimic a slow web application:
 
-    GET http://dummy-api.varnish-software.com/?random-content=10&predictable-content=20&response-status=418&body-delay=2&max-age=2&s-maxage=3
+    GET http://dummy-api.varnish-software.com/foo?random-content=10&predictable-content=20&response-status=418&body-delay=2&max-age=2&s-maxage=3
     
     HTTP/1.1 418 
     Cache-control: max-age=2, s-maxage=3
@@ -31,8 +31,10 @@ Some examples are:
         "random-content": "mqYA4IXTNG", 
         "response-status": 418, 
         "s-maxage": 3, 
-        "uri": "/"
+        "uri": "/foo"
     }
+
+The following is a ``POST`` request to ``dummy-api.varnish-software.com`` and path ``/someurl``, where the response status should be ``201`` and the ``cache-control`` header should be set to ``must-revalidate``:
 
     POST http://dummy-api.varnish-software.com/someurl?must-revalidate&response-status=201
     
