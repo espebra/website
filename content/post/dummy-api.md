@@ -3,7 +3,7 @@ Categories = ["Development", "API"]
 Description = ""
 Tags = ["Development", "API"]
 date = "2015-05-02T21:42:21+02:00"
-menu = "main"
+menu = "blog"
 title = "Dummy API"
 
 +++
