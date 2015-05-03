@@ -36,9 +36,9 @@ The following is a``GET`` request to host ``dummy-api.varnish-software.com`` and
         "uri": "/foo"
     }
 
-The following is a ``POST`` request to ``dummy-api.varnish-software.com`` and path ``/someurl``, where the response status should be ``201`` and the ``cache-control`` header should be set to ``must-revalidate``:
+The following is a ``POST`` request to ``dummy-api.varnish-software.com`` and path ``/someurl``, where the response status should be ``201``, the ``cache-control`` header should be set to ``must-revalidate`` and the ``content-length`` header should be set instead of using ``chunked`` ``transfer-encoding``:
 
-    POST http://dummy-api.varnish-software.com/someurl?must-revalidate&response-status=201
+    POST http://dummy-api.varnish-software.com/someurl?must-revalidate&response-status=201&content-length
     
     HTTP/1.1 201 Created
     Cache-control: must-revalidate
