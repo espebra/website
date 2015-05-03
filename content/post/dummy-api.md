@@ -65,7 +65,7 @@ The buit in help text is available with the ``help`` request header or query par
     Connection: close
     Content-Type: text/plain
     Date: Sat, 02 May 2015 19:59:39 GMT
-    Server: openresty
+    Server: Dummy API
     Transfer-Encoding: chunked
     
     Dummy API
