@@ -8,7 +8,7 @@ title = "Varnish goes upstack with varnish modules and varnish configuration lan
 
 +++
 
-*This is a post first published at [High Scalability](http://highscalability.com/blog/2015/5/6/varnish-goes-upstack-with-varnish-modules-and-varnish-config.html).*
+*This post was first published at [High Scalability](http://highscalability.com/blog/2015/5/6/varnish-goes-upstack-with-varnish-modules-and-varnish-config.html).*
 
 Varnish Software has just released Varnish API Engine, a high performance HTTP API Gateway which handles authentication, authorization and throttling all built on top of Varnish Cache. The Varnish API Engine can easily extend your current set of APIs with a uniform access control layer that has built in caching abilities for high volume read operations, and it provides real-time metrics.
 
