@@ -12,7 +12,7 @@ The purpose of Dummy API to act as a performant, simple and flexible HTTP API to
 
 ![Dummy API](/img/dummy-api.png)
 
-The following is a``GET`` request to host ``dummy-api.varnish-software.com`` and path ``/foo``, where the response should contain a 10 characters random string, 20 characters predictable random string, response status ``418`` and a ``cache-control`` header with the value ``max-age=2, s-maxage=3``. The response will be delivered with a 2 seconds delay before the first byte of the body, to mimic a slow web application:
+The following is a ``GET`` request to host ``dummy-api.varnish-software.com`` and path ``/foo``, where the response should contain a 10 characters random string, 20 characters predictable random string, response status ``418`` and a ``cache-control`` header with the value ``max-age=2, s-maxage=3``. The response will be delivered with a 2 seconds delay before the first byte of the body, to mimic a slow web application:
 
     GET http://dummy-api.varnish-software.com/foo?random-content=10&predictable-content=20&response-status=418&body-delay=2&max-age=2&s-maxage=3
     
