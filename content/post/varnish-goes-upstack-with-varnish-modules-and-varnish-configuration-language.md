@@ -135,7 +135,7 @@ We do throttling on this request only if we got proper values from the previous 
 
             if (req.http.requests != "" && req.http.period != "") {
 
-Increment or create a Memcached counter unique for this client.ip and path with the value 1. The expiry time we specify is equal to the period in the throttle rule set in the database. This way, the throttle rules can be flexible regarding time period. The return value is the new value of the counter, which corresponds to the amount of requests this client.ip has done this path in the current time period.
+Increment or create a Memcached counter unique for this ``client.ip`` and path with the value 1. The expiry time we specify is equal to the period in the throttle rule set in the database. This way, the throttle rules can be flexible regarding time period. The return value is the new value of the counter, which corresponds to the amount of requests this ``client.ip`` has done this path in the current time period.
 
                 set req.http.counter = memcached.incr_set(
                     req.http.path + "-" + client.ip, 1, 1, std.integer(req.http.period, 0));
