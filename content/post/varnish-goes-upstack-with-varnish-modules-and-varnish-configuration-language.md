@@ -110,14 +110,14 @@ Now it is time to write the mini-application in VCL. Our test environment consis
         import sqlite3;
         import memcached;
 
-VMODs are usually configured in vcl_init, and this is true for sqlite3 and memcached as well. For sqlite3, we set the path to the database and the field delimiter to use on multi column results. The memcached VMOD can have a wide variety of configuration options supported by <a href="http://docs.libmemcached.org/libmemcached_configuration.html">libmemcached</a>.
+VMODs are usually configured in ``vcl_init``, and this is true for sqlite3 and memcached as well. For sqlite3, we set the path to the database and the field delimiter to use on multi column results. The memcached VMOD can have a wide variety of configuration options supported by <a href="http://docs.libmemcached.org/libmemcached_configuration.html">libmemcached</a>.
 
         sub vcl_init {
             sqlite3.open("/tmp/rules.db3", "|;");
             memcached.servers("--SERVER=localhost --BINARY-PROTOCOL");
         }
 
-In ``vcl_recv``, the incoming HTTP requests are received. We start by extracting the request path without query parameters and potential dangerous characters. This is important since the path will be part of the SQL query later. The following regex will match the req.url from the beginning of the line up until any of the characters ? &amp; ;  “  ‘ or whitespace.
+In ``vcl_recv``, the incoming HTTP requests are received. We start by extracting the request path without query parameters and potential dangerous characters. This is important since the path will be part of the SQL query later. The following regex will match ``req.url`` from the beginning of the line up until any of the characters ? &amp; ;  “  ‘ or whitespace.
 
         sub vcl_recv {
             set req.http.path = regsub(req.url, {"^([^?&;"' ]+).*"}, "\1");
