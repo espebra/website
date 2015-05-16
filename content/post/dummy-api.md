@@ -1,7 +1,7 @@
 +++
 Categories = ["Development", "API"]
 Description = ""
-Tags = ["Development", "API"]
+Tags = ["Development", "API", "lua", "openresty"]
 date = "2015-05-02T21:42:21+02:00"
 menu = "blog"
 title = "Dummy API"
