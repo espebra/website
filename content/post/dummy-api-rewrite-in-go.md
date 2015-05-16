@@ -19,9 +19,9 @@ I turned to [Go](https://golang.org/) and its [http server](https://golang.org/p
     $ chmod +x dummy-api
     $ ./dummy-api -host=0.0.0.0 -port=8080
 
-When building the binary, it is possible to cross compile to various architectures and platforms. 
+It is possible to cross compile to various architectures and platforms. 
 
-I have built and pushed the binary version built for ``Linux`` on ``x86_64`` to the repository. The result is that the installation steps have been narrowed down to:
+I have compiled and pushed the binary version for ``Linux`` on ``x86_64`` to the repository. The result is that the installation steps have been narrowed down to:
 
     $ wget https://github.com/espebra/dummy-api/raw/master/dummy-api
     $ chmod +x dummy-api
