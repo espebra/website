@@ -34,6 +34,7 @@ By default, it will bind to ``127.0.0.1:1337``. ``./dummy-api -help`` shows the 
       -maxheaderbytes=1048576: Max header bytes.
       -port=1337: Listen port
       -readtimeout=10: Read timeout in seconds
+      -verbose=false: Verbose stdout.
       -writetimeout=10: Write timeout in seconds
 
 The usage guide for web clients is shown with the ``help`` query parameter:

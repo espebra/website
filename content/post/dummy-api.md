@@ -8,6 +8,8 @@ title = "Dummy API"
 
 +++
 
+*Update: Dummy API has been [rewritten in Go]({{< ref "post/dummy-api-rewrite-in-go.md" >}}).*
+
 The purpose of Dummy API to act as a performant, simple and flexible HTTP API to use when testing API gateway performance. Put it behing a API gateway and generate responses to it from a set of consumers/clients. The Dummy API will read the request headers and query parameters and generate the responses accordingly. Some examples are custom cache-control header, response status and response delays.
 
 ![Dummy API](/img/dummy-api.png)
