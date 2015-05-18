@@ -12,7 +12,7 @@ Dummy API was [originally]({{< ref "post/dummy-api.md" >}}) written in Lua for r
 
 The purpose of Dummy API is to be that web application that can be rapidly installed and started when it is necessary to test API managers and web caches with a proper web application. The installation should be as simple and quick as possible.
 
-I turned to [Go](https://golang.org/) and its [http server](https://golang.org/pkg/net/http/), and reimplemented the Dummy API. What is really appealing it that is possible to compile an entire web application including all dependencies into one binary file. It means that the Dummy API and the web server can be compiled and distributed as one executable file:
+I turned to [Go](https://golang.org/) and its [http server](https://golang.org/pkg/net/http/), and reimplemented the Dummy API. What is really appealing about Go is that it is possible to compile an entire web application including all dependencies into one binary file. It means that the Dummy API and the web server can be compiled and distributed as one executable file:
 
     $ sudo yum install golang
     $ go build dummy-api.go
