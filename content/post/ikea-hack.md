@@ -32,9 +32,9 @@ Setup
 
 This is straight forward. I used a [router](https://en.wikipedia.org/wiki/Router_(woodworking\)) to hollow out some space for the legs' mounting plates, in an attempt to make the mounting plates invisible when the table is in upright position. I just happend to have a lot of glue, so I obviously applied a lot of it when fastening the mouning plates. This thing will never fall apart!
 
-![WIP-1](/img/ikea-hack-1.png)
+![WIP-1](/img/ikea-hack-1.jpg)
 
-![WIP-2](/img/ikea-hack-2.png)
+![WIP-2](/img/ikea-hack-2.jpg)
 
 One leg fastened. Repeat, repeat and repeat - and the tabletop table to be suddenly has four legs.
 
