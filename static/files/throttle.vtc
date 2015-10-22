@@ -1,0 +1,166 @@
+varnishtest "Throttling with SQLite and Memcached"
+
+# sqlite3 /tmp/rules.db3 "CREATE TABLE t (rule text, path text);"
+# sqlite3 /tmp/rules.db3 "INSERT INTO t (rule, path) VALUES ('3r5', '/search');"
+# sqlite3 /tmp/rules.db3 "INSERT INTO t (rule, path) VALUES ('15r3600', '/login');"
+# varnishtest highscalability.vtc
+
+# Define a varnishtest mock server which handles requests, and expects some headers to be added by Varnish
+server s1 {
+    rxreq
+    expect req.url == "/"
+    txresp
+    
+    rxreq
+    expect req.url == "/search?id=123&type=1"
+    expect req.http.path == "/search"
+    expect req.http.rule == "3r5"
+    expect req.http.requests == "3"
+    expect req.http.period == "5"
+    expect req.http.counter == "1"
+    txresp
+    
+    rxreq
+    expect req.url == "/search?id=123&type=2"
+    expect req.http.path == "/search"
+    expect req.http.rule == "3r5"
+    expect req.http.requests == "3"
+    expect req.http.period == "5"
+    expect req.http.counter == "2"
+    txresp
+
+    rxreq
+    expect req.url == "/search?id=123&type=3"
+    expect req.http.path == "/search"
+    expect req.http.rule == "3r5"
+    expect req.http.requests == "3"
+    expect req.http.period == "5"
+    expect req.http.counter == "3"
+    txresp
+
+    rxreq
+    expect req.url == "/search?id=123&type=4"
+    expect req.http.path == "/search"
+    expect req.http.rule == "3r5"
+    expect req.http.requests == "3"
+    expect req.http.period == "5"
+    expect req.http.counter == "1"
+    txresp
+} -start
+
+# Define the VCL used in the tests, commented inline
+varnish v1 -vcl+backend {
+    vcl 4.0;
+    import std;
+    import sqlite3;
+    import memcached;
+
+    sub vcl_init {
+        sqlite3.open("/tmp/rules.db3", "|;");
+        memcached.servers("--SERVER=localhost --BINARY-PROTOCOL");
+    }
+
+    sub vcl_recv {
+        # Extract the path without query parameters and potential dangerous characters.
+        set req.http.path = regsub(req.url, {"^([^?&;"' ]+).*"}, "\1");
+
+        # Do the SQLite lookup, log timing information.
+        std.timestamp("Pre SQLite");
+        set req.http.rule = sqlite3.exec("SELECT rule FROM t WHERE path='" + req.http.path + "' LIMIT 1");
+        std.timestamp("Post SQLite");
+
+        # Parse the response.
+        set req.http.requests = regsub(req.http.rule, "^([0-9]+)r.*$", "\1");
+        set req.http.period = regsub(req.http.rule, "^[0-9]+r([0-9]+)$", "\1");
+
+        # Check we have a rule for this path.
+        if (req.http.requests != "" && req.http.period != "") {
+
+            # Increment or create a counter unique for this client.ip and path.
+            # Log timing information.
+            std.timestamp("Pre memcached");
+            set req.http.counter = memcached.incr_set(
+                req.http.path + "-" + client.ip, 1, 1, std.integer(req.http.period, 0));
+            std.timestamp("Post memcached");
+            
+            # Check if the counter is higher than the limit set in the database.
+            if (std.integer(req.http.counter, 0) > std.integer(req.http.requests, 0)) {
+                return (synth(429, "Too many requests"));
+            }
+        }
+    }
+
+    sub vcl_deliver {
+        # Display the throttle status in the response headers on delivery.
+        if (req.http.requests && req.http.counter && req.http.period) {
+            set resp.http.X-RateLimit-Limit = req.http.requests;
+            set resp.http.X-RateLimit-Counter = req.http.counter;
+            set resp.http.X-RateLimit-Period = req.http.period;
+        }
+    }
+    
+    sub vcl_synth {
+        # Display the throttle status in the response headers on errors.
+        if (req.http.requests && req.http.counter && req.http.period) {
+            set resp.http.X-RateLimit-Limit = req.http.requests;
+            set resp.http.X-RateLimit-Counter = req.http.counter;
+            set resp.http.X-RateLimit-Period = req.http.period;
+        }
+    }
+} -start
+
+# Describe client requests and expected response codes and headers 
+
+# This clients request does not match the rules defined, so no rate-headers should be defined
+client c1 {
+    txreq -url "/"
+    rxresp
+    expect resp.status == 200
+    expect resp.http.X-RateLimit-Limit == <undef>
+    expect resp.http.X-RateLimit-Counter == <undef>
+    expect resp.http.X-RateLimit-Period == <undef>
+} -run
+
+# This clients requests match, and we expect the ratelimit headers
+# The last request should be over limit
+client c2 {
+    txreq -url "/search?id=123&type=1"
+    rxresp
+    expect resp.status == 200
+    expect resp.http.X-RateLimit-Limit == "3"
+    expect resp.http.X-RateLimit-Counter == "1"
+    expect resp.http.X-RateLimit-Period == "5"
+
+    txreq -url "/search?id=123&type=2"
+    rxresp
+    expect resp.status == 200
+    expect resp.http.X-RateLimit-Limit == "3"
+    expect resp.http.X-RateLimit-Counter == "2"
+    expect resp.http.X-RateLimit-Period == "5"
+
+    txreq -url "/search?id=123&type=3"
+    rxresp
+    expect resp.status == 200
+    expect resp.http.X-RateLimit-Limit == "3"
+    expect resp.http.X-RateLimit-Counter == "3"
+    expect resp.http.X-RateLimit-Period == "5"
+
+    txreq -url "/search?id=123&type=4"
+    rxresp
+    expect resp.status == 429
+    expect resp.http.X-RateLimit-Limit == "3"
+    expect resp.http.X-RateLimit-Counter == "4"
+    expect resp.http.X-RateLimit-Period == "5"
+} -run
+
+delay 5;
+
+# After this delay, this request should be allowed again
+client c3 {
+    txreq -url "/search?id=123&type=4"
+    rxresp
+    expect resp.status == 200
+    expect resp.http.X-RateLimit-Limit == "3"
+    expect resp.http.X-RateLimit-Counter == "1"
+    expect resp.http.X-RateLimit-Period == "5"
+} -run

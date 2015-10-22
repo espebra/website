@@ -50,7 +50,7 @@ First we need a database with our throttle rules. Using the sqlite3 command, we 
 
 These rules will allow 3 requests per 5 seconds to ``/search`` and 15 requests per hour to ``/login``. The idea is to enforce these rules on a per IP basis.
 
-For the sake of simplicity, we’ll write the tests and VCL configuration in the same file, [throttle.vtc](https://www.varnish-software.com/static/vcl/throttle.vtc). It is, however, possible to include separate VCL configuration files using include statements in the test files, to separate VCL configuration and the different tests.
+For the sake of simplicity, we’ll write the tests and VCL configuration in the same file, [throttle.vtc](/files/throttle.vtc). It is, however, possible to include separate VCL configuration files using include statements in the test files, to separate VCL configuration and the different tests.
 
 The first line in the file is optionally used to set the name or the title of the test.
 
@@ -253,7 +253,7 @@ Requests to our application in the example will receive the following response h
     X-Varnish: 32774
     Via: 1.1 varnish-plus-v4
 
-The complete [throttle.vtc](https://www.varnish-software.com/static/vcl/throttle.vtc) file outputs timestamp information before and after VMOD processing, to give us some data on the overhead introduced by the Memcached and SQLite queries. Running 60 requests in varnishtest on a local vm with Memcached running locally returned the following timings pr operation (in ms):
+The complete [throttle.vtc](/files/throttle.vtc) file outputs timestamp information before and after VMOD processing, to give us some data on the overhead introduced by the Memcached and SQLite queries. Running 60 requests in varnishtest on a local vm with Memcached running locally returned the following timings pr operation (in ms):
 
 * SQLite SELECT, max: 0.32, median: 0.08, average: 0.115
 * Memcached incr_set(), max: 1.23, median: 0.27, average: 0.29
