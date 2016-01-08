@@ -3,7 +3,6 @@ Categories = ["Development", "Golang"]
 Description = ""
 Tags = ["Development", "golang"]
 date = "2016-01-08T21:11:44+01:00"
-menu = "main"
 title = "Gofer - Simple notification IRC bot"
 
 +++
