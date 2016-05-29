@@ -27,7 +27,7 @@ Some of the most visible changes are:
 
 * **No moderation**
 
-    The *report for moderation* functionality is gone. As a replacement, files can be deleted by any user knowing the URL to the bin. This is potentially controversional and problematic. The idea is to let users themselves delete inappropriate files uploaded by other users instead of going through a moderation process.
+    The *report for moderation* functionality is gone. As a replacement, files can be deleted by any user knowing the URL to the bin. This is potentially controversional and problematic. The idea is to let users themselves delete malicious or illegal files uploaded by other users instead of going through a moderation process.
 
     The potential downside is obviously that bad internet citizens that know the URL to a perfectly valid bin have access to delete it, and may do so just for the fun of it.
 
