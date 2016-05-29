@@ -37,6 +37,12 @@ Some of the most visible changes are:
 
     Bins with images now have an *album view* with larger versions of the images. This makes it convenient to view multiple images.
 
+* **Dynamic expiration of bins**
+
+    Bins are created with a default expiration time of two months. Whenever new files are uploaded to a bin, its expiration time is reset to two months again. This makes bins long lived if files are uploaded now and then.
+
+    The default expiration at the time of this writing is two months, but it can be adjusted.
+
 ## New software stack
 
 The infrastructure, bandwidth and hardware needed to run [filebin.net](https://filebin.net) is sponsored by [Redpill Linpro](http://redpill-linpro.com/), the leading provider of professional Open Source services and products in the Nordic region.
