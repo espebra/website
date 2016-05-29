@@ -1,7 +1,7 @@
 +++
-Categories = ["Development", "GoLang"]
+Categories = ["Development", "GoLang", "filebin"]
 Description = ""
-Tags = ["Development", "golang"]
+Tags = ["Development", "golang", "filebin"]
 date = "2016-05-29T20:40:48+02:00"
 title = "Filebin upgrade"
 
@@ -42,6 +42,10 @@ Some of the most visible changes are:
     Bins are created with a default expiration time of two months. Whenever new files are uploaded to a bin, its expiration time is reset to two months again. This makes bins long lived if files are uploaded now and then.
 
     The default expiration at the time of this writing is two months, but it can be adjusted.
+
+* **Mobile friendly**
+
+    The web interface is responsive and mobile friendly. Files uploaded from iOS devices are renamed appropriately to [avoid file name collision](http://apple.stackexchange.com/questions/118154/can-i-specify-the-file-name-of-an-ios-safari-image-upload).
 
 ## New software stack
 
