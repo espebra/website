@@ -45,22 +45,22 @@ Some of the most visible changes are:
 
 * **Mobile friendly**
 
-    The web interface is responsive and mobile friendly. Files uploaded from iOS devices are renamed appropriately to [avoid file name collision](http://apple.stackexchange.com/questions/118154/can-i-specify-the-file-name-of-an-ios-safari-image-upload).
+    The web interface is responsive and mobile friendly. Files uploaded from iOS devices are handled properly to [avoid file name collision](http://apple.stackexchange.com/questions/118154/can-i-specify-the-file-name-of-an-ios-safari-image-upload).
 
-## New software stack
+## New hardware and software stack
 
 The infrastructure, bandwidth and hardware needed to run [filebin.net](https://filebin.net) is sponsored by [Redpill Linpro](http://redpill-linpro.com/), the leading provider of professional Open Source services and products in the Nordic region.
 
-As part of todays upgrade, [filebin.net](https://filebin.net) has been migrated into their IaaS cloud which is based on [OpenStack](https://www.openstack.org/) and [Ceph](http://ceph.com/), runs on modern hardware and spans multiple locations.
+As part of todays upgrade, [filebin.net](https://filebin.net) has been migrated into their awesome IaaS cloud which is based on [OpenStack](https://www.openstack.org/) and [Ceph](http://ceph.com/), runs on modern hardware and spans multiple locations.
 
 * **Encrypted communications**
 
-    Client-server communication is now encrypted using HTTPS/TLS with certificates from [Let's encrypt](https://letsencrypt.org/). The TLS proxy [Hitch](https://hitch-tls.org) is used to take care of the TLS handling.
+    Client-server communication is now encrypted using HTTPS/TLS with certificates from [Let's Encrypt](https://letsencrypt.org/). The TLS proxy [Hitch](https://hitch-tls.org) is used to take care of the TLS handling.
 
 * **HTTP caching**
 
     [Varnish Cache](https://varnish-cache.org) is now running in front of Filebin to boost performance.
 
-The source code of Filebin is available at [Github](https://github.com/espebra/filebin). Bugs are reported and tracked in [Github issues](https://github.com/espebra/filebin/issues).
+The source code of Filebin is available in [Github](https://github.com/espebra/filebin). Bugs are reported and tracked in [Github issues](https://github.com/espebra/filebin/issues).
 
-Feel free to reach out for feedback and suggestions by email to espebra(a)ifi.uio.no, or by leaving a comment to this blog post.
+Feel free to reach out with feedback and suggestions by email to espebra(a)ifi.uio.no, or by leaving a comment to this blog post.
