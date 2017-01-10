@@ -1,0 +1,16 @@
+<div class="row">
+	<div class="col-md-12">
+		<h1>{{ .Title }}</h1>
+		<small class="text-muted">
+			Published {{ .Date.Format "Monday, January 2, 2006" }} ({{ .FuzzyWordCount }} words, {{ .ReadingTime }} minutes to read).
+		</small>
+		
+		<p>
+			{{ .Content }}
+		</p>
+        </div>
+
+	<div class="col-md-12">
+		{{ partial "comments.html" . }}
+	</div>
+</div>

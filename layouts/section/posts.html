@@ -1,0 +1,33 @@
+{{ partial "head.html" . }}
+
+<div class="container">
+        <div class="row">
+                <div class="col-md-12">
+                        <ol class="breadcrumb">
+                                <li class="breadcrumb-item"><a href="/">Home</a></li>
+                                <li class="breadcrumb-item active">Posts</li>
+                        <ol>
+                </div>
+        </div>
+</div>
+
+<div class="container">
+{{ range .Data.Pages }}
+	<div class="row">
+		<div class="col-md-12">
+			<h3>
+				{{ .Title }}
+				<a href="{{ .Permalink }}"><i class="fa fa-arrow-right" aria-hidden="true"></i></a>
+			</h3>
+			<small class="text-muted">
+				Published {{ .Date.Format "Monday, January 2, 2006" }} ({{ .FuzzyWordCount }} words, {{ .ReadingTime }} minutes to read).
+			</small>
+			<p>
+				{{ .Summary }}... <a href="{{ .Permalink }}">read more</a>
+			</p>
+		</div>
+	</div>
+{{ end }}
+</div>
+</body>
+</html>

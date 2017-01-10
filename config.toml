@@ -1,13 +1,12 @@
 languageCode = "en-us"
 title = "Espen Braastad"
-theme = "custom"
 baseurl = "http://www.espenbraastad.no/"
 
 [Author]
 name = "Espen Braastad"
 
 #[Permalinks]
-#post = "/post/:year/:month/:filename/"
+#post = "/posts/:year/:month/:filename/"
 #code = "/:filename/"
 
 [params]
