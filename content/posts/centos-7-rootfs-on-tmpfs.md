@@ -168,6 +168,8 @@ Copy the kernel directly from the root filesystem using:
 cp /work/newroot/boot/vmlinuz-*x86_64 /work/result/vmlinuz
 ```
 
+## Result
+
 The ``/work/result`` directory now contains two files with file sizes similar to the following:
 
 ``` bash
