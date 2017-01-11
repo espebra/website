@@ -8,9 +8,9 @@ Description = ""
 
 +++
 
-Several years ago I wrote a [series](/posts/el6-rootfs-on-tmpfs/) [of](/posts/el6-rootfs-on-tmpfs-update/) [posts](/posts/el6-rootfs-on-tmpfs-update2/) on how to run EL6 with its root filesystem on tmpfs. This post is a continuation of that series, and explains step by step how to run CentOS 7 with its root filesystem in memory. It should apply to RHEL, Ubuntu, Debian and other Linux distributions as well.
+Several years ago I wrote a [series](/posts/el6-rootfs-on-tmpfs/) [of](/posts/el6-rootfs-on-tmpfs-update/) [posts](/posts/el6-rootfs-on-tmpfs-update2/) on how to run EL6 with its root filesystem on tmpfs. This post is a continuation of that series, and explains step by step how to run CentOS 7 with its root filesystem in memory. It should apply to RHEL, Ubuntu, Debian and other Linux distributions as well. The post is a bit terse to focus on the concept, and several of the steps have potential for improvements.
 
-This post is a bit terse to show the concept. Several of the steps have potential for improvements.
+The following is a screen recording from a host running CentOS 7 in tmpfs:
 
 ![Sensor](/img/centos7-in-tmpfs.gif)
 
