@@ -1,32 +1,33 @@
 {{ partial "head.html" . }}
 
-<div class="jumbotron">
+{{ range first 1 .Data.Pages }}
 	<div class="container">
-		<div class="d-flex flex-row">
-  			<div class="p-2">
-				<img src="/img/espen.png" width="100px" height="100px" class="rounded-circle">
-			</div>
-  			<div class="p-2">
-				This is where I put my public notes, mostly related to IT operations. Some of my projects are available at <a href="https://github.com/espebra/">Github</a>.
-				<footer class="blockquote-footer">Espen Braastad</footer>
+		<div class="row">
+			<div class="col-md-12">
+				<ol class="breadcrumb">
+					<li class="breadcrumb-item active">Home</li>
+				<ol>
 			</div>
 		</div>
 	</div>
-</div>
 
-<div class="container">
-{{ range first 1 .Data.Pages }}
-        <div class="row">
-                <div class="col-md-12">
-                        <ol class="breadcrumb">
-                                <li class="breadcrumb-item active">Home</li>
-                                <li class="breadcrumb-item"><a href="/posts">Posts</a></li>
-                                <li class="breadcrumb-item active">{{ .Title }}</li>
-                        <ol>
-                </div>
-        </div>
+	<div class="jumbotron">
+		<div class="container">
+			<div class="d-flex flex-row flex-wrap flex-md-nowrap justify-content-center justify-content-md-start">
+				<div class="p-2 align-self-center">
+					<img src="/img/espen.png" width="100px" height="100px" class="rounded-circle">
+				</div>
+				<div class="p-2 align-self-center">
 
-	{{ partial "singlepost.html" . }}
+					This is where I put my public notes on various projects, possibly related to IT operations. Older notes are available in the  <a href="/posts">archive</a>. Some of my projects are available in <a href="https://github.com/espebra/">Github</a>.
+					<footer class="blockquote-footer">Espen Braastad</footer>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="container">
+		{{ partial "singlepost.html" . }}
+	</div>
 {{ end }}
-</div>
 {{ partial "footer.html" . }}
