@@ -12,6 +12,8 @@ Several years ago I wrote a [series](/posts/el6-rootfs-on-tmpfs/) [of](/posts/el
 
 This post is a bit terse to show the concept. Several of the steps have potential for improvements.
 
+![Sensor](/img/centos7-in-tmpfs.gif)
+
 ## Build environment
 
 A build host is needed to prepare the image to boot from. The build host should run CentOS 7 x86\_64, and have the following packages installed:
