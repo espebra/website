@@ -19,7 +19,7 @@ The following is a screen recording from a host running CentOS 7 in tmpfs:
 A build host is needed to prepare the image to boot from. The build host should run CentOS 7 x86\_64, and have the following packages installed:
 
 ``` bash
-yum install libvirt virt-builder guestfish
+yum install libvirt libguestfs-tools guestfish
 ```
 
 Make sure the libvirt daemon is running:
