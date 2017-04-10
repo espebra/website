@@ -113,19 +113,17 @@ error() {
 /bin/busybox --install /bin
 
 mkdir -p /proc
-mount -n -t proc none /proc
+mount -t proc proc /proc
 
 mkdir -p /sys
-mount -n -t sysfs none /sys
+mount -t sysfs sysfs /sys
+
 mkdir -p /sys/dev
-
 mkdir -p /var/run
-
 mkdir -p /dev
-mount -n -t tmpfs -o mode=0755 mdev /dev
 
 mkdir -p /dev/pts
-mount -n -t devpts devpts /dev/pts
+mount -t devpts devpts /dev/pts
 
 # Populate /dev
 echo /bin/mdev > /proc/sys/kernel/hotplug
