@@ -12,9 +12,9 @@ aliases = [
 
 +++
 
+*Update 2017-06-30: Please see the [updated guide](/posts/centos-7-rootfs-on-tmpfs/) which is more generic.*
 
-
-UPDATE: The patch below has been updated [here](/posts/el6-rootfs-on-tmpfs-update).
+*UPDATE: The patch below has been updated [here](/posts/el6-rootfs-on-tmpfs-update).*
 
 There are several scenarios where conventional hard drives are not really needed. Examples are HPC cluster nodes, virtualization nodes, home theater streaming PCs, silent desktops, internet cafés and embedded systems. Hard drives tend to fail, they are slow, they consume power, they generate heat and noise, and they are quite expensive if you need/want something faster and more reliable than SATA.
 

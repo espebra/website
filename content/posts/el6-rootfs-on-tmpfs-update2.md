@@ -11,6 +11,7 @@ aliases = [
 
 +++
 
+*Update 2017-06-30: Please see the [updated guide](/posts/centos-7-rootfs-on-tmpfs/) which is more generic.*
 
 In a [previous post](/posts/el6-rootfs-on-tmpfs), I’ve explained how to boot EL6 from memory without having / needing a physical disk.
 

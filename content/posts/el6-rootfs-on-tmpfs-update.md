@@ -11,6 +11,8 @@ aliases = [
 
 +++
 
+*Update 2017-06-30: Please see the [updated guide](/posts/centos-7-rootfs-on-tmpfs/) which is more generic.*
+
 In EL6.4, the file ``/usr/share/dracut/modules.d/90dmsquash-live/dmsquash-live-root`` was updated so that the [previous patch](/post/el6-rootfs-on-tmpfs) no longer works as it should. I’ve updated the patch, and here it is:
 
 ``` diff
