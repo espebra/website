@@ -2,7 +2,7 @@
 Categories = ["netbooting"]
 Tags = ["diskless", "el7", "ipxe", "linux", "netboot", "initramfs", "packer", "zfs"]
 menu = "blog"
-date = "2017-10-20T23:33:20+01:00"
+date = "2017-10-24T00:20:20+01:00"
 title = "ZFS NAS using CentOS 7 from tmpfs"
 Description = ""
 
